@@ -12,10 +12,14 @@
  */
  
 chrome.app.runtime.onLaunched.addListener(function() {
-  chrome.app.window.create('pear_music.html', {
-    'outerBounds': {
-      'width': 400,
-      'height': 500
-    }
-  });
+	var screenWidth = screen.availWidth;
+	var screenHeight = screen.availHeight;
+	chrome.app.window.create('views/pear_music.html', {
+			'outerBounds': {
+			'width': 1200,
+			'height': 800,
+			left: Math.round((screenWidth-width)/2),
+			top: Math.round((screenHeight-height)/2)
+		}
+	});
 });
