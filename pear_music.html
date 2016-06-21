@@ -23,9 +23,34 @@
 </head>
 
 <body>
+<!-- <nav class="navbar navbar-dark navbar-fixed-top bg-inverse">
+      <button type="button" class="navbar-toggler hidden-sm-up" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Project name</a>
+      <div id="navbar">
+        <nav class="nav navbar-nav pull-xs-left">
+          <a class="nav-item nav-link" href="#">Dashboard</a>
+          <a class="nav-item nav-link" href="#">Settings</a>
+          <a class="nav-item nav-link" href="#">Profile</a>
+          <a class="nav-item nav-link" href="#">Help</a>
+        </nav>
+        <form class="pull-xs-right">
+          <input type="text" class="form-control" placeholder="Search...">
+        </form>
+      </div>
+    </nav> -->
+
+
     <div id="header-wrapper">
-      <div id="header-content">
+      <div id="header-content" class="container-fluid">
         <div class="brand">Pear Music</div>
+        <form class="pull-left form-inline">
+          <input id=searchBox type="text" class="empty"placeholder="&#xF002;">
+        </form>
       </div>
     </div>
     <div id="wrapper">
@@ -103,6 +128,7 @@
     <script src="library/bootstrap.min.js"></script>
 
     <!-- Custom JS -->
+    <script src="public/js/main.js"></script>
     <script src="public/js/controller.js"></script>
     <script src="public/js/model.js"></script>
     <script src="public/js/view.js"></script>

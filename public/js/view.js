@@ -1,10 +1,8 @@
-
-
 function View(playerModel) {
-	this.calcElement = $('#calc');
+	this.searchBox = $('#searchBox');
 	this.buttonsElement = $('#buttons');
 	this.displayElement = $('#display');
 	this.lastDisplayElement = null;
 	this.BuildWidgets();
-	var calc = this;	
+	var player = this;
 }
