@@ -27,10 +27,10 @@
     <div id="header-wrapper">
       <div id="header-content" class="container-fluid">
         <div class="brand">Pear Music</div>
-        <form id="searchForm" class="pull-left form-inline">
+        <div id="searchForm" class="pull-left">
           <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-          <input id=searchBox type="text" class="empty"placeholder="Search">
-        </form>
+          <input id=searchBox type="text" class="empty" placeholder="Search" autocomplete="off">
+        </div>
       </div>
     </div>
     <div id="wrapper">
@@ -45,7 +45,7 @@
                     </a>
                   </li>
 
-                  <li  data-toggle="collapse" data-target="#products" class="collapsed active">
+                  <li  data-toggle="collapse" data-target="#products" class="collapsed">
                     <a href="#"><i class="fa fa-gift fa-lg"></i> UI Elements <span class="arrow"></span></a>
                   </li>
                   <ul class="sub-menu collapse" id="products">
@@ -69,34 +69,46 @@
                   <ul class="sub-menu collapse" id="new">
                     <li>New New 1</li>
                   </ul>
-
-
-                   <li>
-                    <a href="#">
-                    <i class="fa fa-user fa-lg"></i> Profile
-                    </a>
-                    </li>
-
-                   <li>
-                    <a href="#">
-                    <i class="fa fa-users fa-lg"></i> Users
-                    </a>
-                  </li>
               </ul>
           </div>
       </div>
 
       <div id="page-wrapper">
+        <div id="searchResult" class="music-list">
+          <ul id="searchContent" class="music-content">
+<!--               <li>
+                <a href="#">Hello World</a>
+              </li> -->
+<!--               <li>
+                <a href="#">HaHa HoHo</a>
+              </li> -->
+          </ul>          
+        </div>
         <div class="container-fluid">
-            <div class="row">
+          <div class="row">
+            <div class="col-lg-2">
+              RANK
+            </div>
+            <div class="col-lg-6">
+              SONG
+            </div>
+            <div class="col-lg-4">
+              ARTIST
+            </div>
+          </div>
+<!--             <div class="row">
                 <div class="col-lg-12">
                     <h1>Simple Sidebar</h1>
                     <p>This template has a responsive menu toggling system. The menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will appear/disappear. On small screens, the page content will be pushed off canvas.</p>
                     <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>.</p>
                     <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
                 </div>
-            </div>
+            </div> -->
         </div>
+      </div>
+      <div id="video-wrapper">
+        <div id="video-player"></div>
+        <div id="controller"></div>
       </div>
     </div>
     <!-- /#wrapper -->

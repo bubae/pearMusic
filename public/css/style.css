@@ -1,4 +1,8 @@
-
+body{
+   min-width:1000px; /* suppose you want minimun width of 1000px */
+   width: auto !important;  /* Firefox will set width as auto */
+   width:1000px;             /* As IE ignores !important it will set width as 1000px; */
+}
 #wrapper {
   padding-left: 0;
   -webkit-transition: all 0.5s ease;
@@ -8,7 +12,7 @@
 }
 
 #wrapper.toggled {
-  padding-left: 250px;
+  padding-left: 270px;
 }
 
 #header-wrapper {
@@ -23,6 +27,7 @@
   color: #ffffff;
   height: 45px;
   line-height: 45px;
+  padding: 0px;
 }
 
 #header-content .brand{
@@ -31,6 +36,18 @@
   padding-right: 30px;
   font-family: 'Montserrat', sans-serif;
   font-size: 20px;
+  width:0px;
+  padding: 0px 0px 0px 15px;
+  left: 270px;
+  margin-left: -270px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#searchForm {
+  padding-left: 10px;
 }
 
 #searchForm span{
@@ -50,6 +67,36 @@
 
 #searchBox:focus {
   outline: none;
+}
+
+#searchResult {
+  z-index: 1100;
+  width: 285px;
+  position: absolute;
+  background-color: #2e353d;
+  margin: 5px;
+}
+
+.music-list ul,
+.music-list li {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.music-list li{
+  border-bottom: 1px solid #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+}
+
+.music-list li a {
+  color: #ffffff;
+  text-decoration: none;
+  padding-left: 10px;
 }
 
 /*#searchBox.empty {
@@ -85,6 +132,29 @@
   transition: all 0.5s ease;
 }
 
+#page-wrapper {
+  /*float: left;*/
+  /*width: 100% - 300;*/
+}
+
+#video-wrapper {
+  z-index: 1000;  
+  background-color: #252E45;
+  color: #ffffff;
+  float: right;
+  position: fixed;
+  top: 45px;
+  right: 300px;
+  width: 300px;
+  overflow-y: auto;
+  margin-right: -300px;
+  height: 100%;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
 #wrapper.toggled #sidebar-wrapper {
     width: 270px;
 }
@@ -96,21 +166,6 @@
   margin: 0;
   padding: 0;
 }
-/*.nav-side-menu {
-  overflow: auto;
-  font-family: verdana;
-  font-size: 12px;
-  font-weight: 200;
-  background-color: #2e353d;
-  position: fixed;
-  width: 0px;
-  height: 100%;
-  color: #e1ffff;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-}*/
 
 .nav-side-menu .menu-list .menu-content {
   display: block;
@@ -131,7 +186,7 @@
   list-style: none;
   padding: 0px;
   margin: 0px;
-  line-height: 35px;
+  line-height: 40px;
   cursor: pointer;
   /*    
     .collapsed{
@@ -241,13 +296,17 @@
   }*/
 }
 @media (min-width: 767px) {
-
+  #header-content .brand {
+    width: 270px;
+    margin-left: 0px;
+  }
   #wrapper {
-      padding-left: 270px;
+    padding-left: 270px;
+    padding-right: 300px;
   }
 
   #wrapper.toggled {
-      padding-left: 0;
+    padding-left: 0;
   }
 
   #sidebar-wrapper {
@@ -255,7 +314,7 @@
   }
 
   #wrapper.toggled #sidebar-wrapper {
-      width: 0;
+    width: 0;
   }
 }
 body {

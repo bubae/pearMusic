@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  new View(new YoutubePlayer());
+  core = new View(new YoutubePlayer());
 });
 
 

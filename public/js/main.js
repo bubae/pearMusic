@@ -6,3 +6,11 @@
 //         input.removeClass('empty');
 //     }
 // });
+
+
+// $("#searchBox").keyup(function(event){
+//     if(event.keyCode == 13){
+//         console.log($("#searchBox")[0].value)
+//         $("#searchBox")[0].value = ""
+//     }
+// });
