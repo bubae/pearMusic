@@ -11,15 +11,15 @@
 
     <title>Pear Music</title>
 
-    <!--CSS styles-->
+    <!-- CSS styles -->
     <link rel="stylesheet" type="text/css" href="public/css/style.css" />
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" type="text/css" href="library/bootstrap-3.3.6/css/bootstrap.min.css" />
     <!--<link rel="stylesheet" type="text/css" href="library/bootstrap-3.3.6/css/bootstrap-theme.min.css" />-->
     <!--Fonts-->
-    <link rel='stylesheet' href='public/css/font.css' type='text/css'>
-    <link rel="stylesheet" href="library/font-awesome-4.6.3/css/font-awesome.min.css">
+    <link rel='stylesheet' type='text/css' href='public/css/font.css' >
+    <link rel="stylesheet" type='text/css' href="library/font-awesome-4.6.3/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -76,12 +76,6 @@
       <div id="page-wrapper">
         <div id="searchResult" class="music-list">
           <ul id="searchContent" class="music-content">
-<!--               <li>
-                <a href="#">Hello World</a>
-              </li> -->
-<!--               <li>
-                <a href="#">HaHa HoHo</a>
-              </li> -->
           </ul>          
         </div>
         <div class="container-fluid">
@@ -96,34 +90,30 @@
               ARTIST
             </div>
           </div>
-<!--             <div class="row">
-                <div class="col-lg-12">
-                    <h1>Simple Sidebar</h1>
-                    <p>This template has a responsive menu toggling system. The menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will appear/disappear. On small screens, the page content will be pushed off canvas.</p>
-                    <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>.</p>
-                    <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
-                </div>
-            </div> -->
         </div>
       </div>
       <div id="video-wrapper">
-        <div id="video-player"></div>
+      <!-- <webview id="video-player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&widgetid=1" width="300"  height="380" frameborder="0" allowtransparency="true"></webview> -->
         <div id="controller"></div>
       </div>
     </div>
     <!-- /#wrapper -->
 
     <!-- jQuery -->
-    <script src="library/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="library/jquery-2.2.4.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="library/bootstrap.min.js"></script>
+    <script type="text/javascript" src="library/bootstrap.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="public/js/main.js"></script>
-    <script src="public/js/controller.js"></script>
-    <script src="public/js/model.js"></script>
-    <script src="public/js/view.js"></script>
+    <script type="text/javascript" src="public/js/main.js"></script>
+    <script type="text/javascript" src="public/js/controller.js"></script>
+    <script type="text/javascript" src="public/js/model.js"></script>
+    <script type="text/javascript" src="public/js/view.js"></script>
+
+    <!-- Youtube API -->
+    <script type="text/javascript" src="public/js/iframe_api.js"></script>
+    <script type="text/javascript" id="www-widgetapi-script" src="public/js/www-widgetapi.js" async=""></script>
 
 </body>
 
