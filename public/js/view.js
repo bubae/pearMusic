@@ -1,6 +1,6 @@
 var app_key = "AIzaSyBjSx3cD_ArNqKRGFGlVzBQl-N7h16EU8Q";
 
-function View(playerModel) {
+function View() {
 	this.searchBox = $('#searchBox');
 	this.searchResult = $('#searchResult');
 	this.searchContent = $('#searchContent');
@@ -8,6 +8,8 @@ function View(playerModel) {
 	this.displayElement = $('#display');
 	this.lastDisplayElement = null;
 	var player = this;
+
+	// userLists = new listStorage();
 
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
@@ -44,7 +46,7 @@ View.prototype.videoSearch = function(searchText){
 View.prototype.searchResultShow = function(searchData){
 
 	searchContent = $('#searchContent');
-	searchContentTemplate = '<li><a href="#">{{title}}</a></li>';
+	searchContentTemplate = '<li data-id={{videoID}}><a href="#">{{title}}</a></li>';
 	if (searchData == []){
 		this.noSearchResult();
 		return;
@@ -55,8 +57,10 @@ View.prototype.searchResultShow = function(searchData){
 	allContent = "";
 	for (i = 0; i < vidoeInfos.length; i++) {
 		title = vidoeInfos[i].snippet.title;
-		addItem = searchContentTemplate.replace("{{title}}", title);
+		videoID = vidoeInfos[i].id.videoId;
+		addItem = searchContentTemplate.replace("{{title}}", title).replace("{{videoID}}",videoID);
 		allContent = allContent + addItem;		
+		console.log(vidoeInfos[i])
 	}
 	searchContent[0].innerHTML = allContent;
 	contentEventSetUp();

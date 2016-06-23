@@ -39,12 +39,6 @@
           <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
           <div class="menu-list">
               <ul id="menu-content" class="menu-content collapse out">
-                  <li>
-                    <a href="#">
-                    <i class="fa fa-dashboard fa-lg"></i> Dashboard
-                    </a>
-                  </li>
-
                   <li  data-toggle="collapse" data-target="#products" class="collapsed">
                     <a href="#"><i class="fa fa-gift fa-lg"></i> UI Elements <span class="arrow"></span></a>
                   </li>
@@ -53,16 +47,12 @@
                       <li><a href="#">General</a></li>
                       <li><a href="#">Buttons</a></li>
                   </ul>
-
-
                   <li data-toggle="collapse" data-target="#service" class="collapsed">
                     <a href="#"><i class="fa fa-globe fa-lg"></i> Services <span class="arrow"></span></a>
                   </li>  
                   <ul class="sub-menu collapse" id="service">
                     <li>New Service 1</li>
                   </ul>
-
-
                   <li data-toggle="collapse" data-target="#new" class="collapsed">
                     <a href="#"><i class="fa fa-car fa-lg"></i> New <span class="arrow"></span></a>
                   </li>
@@ -93,7 +83,7 @@
         </div>
       </div>
       <div id="video-wrapper">
-      <!-- <webview id="video-player" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&widgetid=1" width="300"  height="380" frameborder="0" allowtransparency="true"></webview> -->
+      <webview id="video-player" src="sandbox.html" partition="static" style="width:300px; height:200px" frameborder="0" allowtransparency="true"></webview>
         <div id="controller"></div>
       </div>
     </div>
@@ -110,10 +100,6 @@
     <script type="text/javascript" src="public/js/controller.js"></script>
     <script type="text/javascript" src="public/js/model.js"></script>
     <script type="text/javascript" src="public/js/view.js"></script>
-
-    <!-- Youtube API -->
-    <script type="text/javascript" src="public/js/iframe_api.js"></script>
-    <script type="text/javascript" id="www-widgetapi-script" src="public/js/www-widgetapi.js" async=""></script>
 
 </body>
 
