@@ -11,7 +11,8 @@ function View() {
 	this.currentPlayList = null;
 	this.numPlayEntry = null;
 	this.store = new listStorage(this);
-
+	this.sandbox = new SandboxMessenger();
+	
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
 			// player.searchContent[0].innerHTML = '';
@@ -159,7 +160,6 @@ View.prototype.searchContentEventSetUp = function(){
 function playListEventSetUp(){
 
 }
-
 
 View.prototype.videoListEventSetUp = function(){
 	$("#playlist-table tbody tr").click(function() {

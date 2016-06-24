@@ -1,5 +1,23 @@
-function SandboxMessenger() {
+var _CONSTANTS = {
+  LOAD_VIDEO: 'LOAD_VIDEO',
+  CUE_VIDEO: 'CUE_VIDEO',
+  TOGGLE_PLAY_PAUSE: 'TOGGLE_PLAY_PAUSE',
+  ERROR_CODE: 6,
+  PLAYER_READY: 'PLAYER_READY',
+  SET_VOLUME: 'SET_VOLUME',
+  SET_VIDEO_SIZE: 'SET_VIDEO_SIZE',
+  SMALL_SIZE: "SMALL_SIZE",
+  BIG_SIZE: "BIG_SIZE",
+  MAX_SIZE: "MAX_SIZE",
+  REPORT_TO_GA: "REPORT_TO_GA",
+};
 
+function SandboxMessenger() {
+	if (!chrome.runtime.id) {
+		return false;
+	}
+
+	chrome.runtime.onMessage.addListener(this.messageHandler);
 }
 
 SandboxMessenger.prototype.sendMessage = function(msg){
@@ -7,7 +25,40 @@ SandboxMessenger.prototype.sendMessage = function(msg){
 }
 
 SandboxMessenger.prototype.messageHandler = function(msg){
+	console.log(msg.data)
+	// switch (msg.data) {
 
+	// 	case _CONSTANTS.PLAYER_STATES.ENDED:
+	// 	case _CONSTANTS.PLAYER_STATES.ERROR:
+	// 		this.store.dispatch((0, _PlaylistActions.playNextSong)());
+	// 		break;
+	// 	case _CONSTANTS.PLAYER_STATES.PLAYING:
+	// 		// Synchronize only when necessary
+	// 		if (!this.store.getState().isPlaying) {
+	// 			this.store.dispatch((0, _ControlsActions.togglePlayingState)());
+	// 		}
+	// 		break;
+	// 	case _CONSTANTS.PLAYER_STATES.PAUSED:
+	// 		// Synchronize only when necessary
+	// 		if (this.store.getState().isPlaying) {
+	// 			this.store.dispatch((0, _ControlsActions.togglePlayingState)());
+	// 		}
+	// 	break;
+	// 	case _CONSTANTS.PLAYER_STATES.PLAYER_READY:
+	// 		var currentSong = this.store.getState().currentSong;
+	// 		if (currentSong) {
+	// 		// HOWON: Should I just CUE instead of LOAD?
+	// 			this.sendMessage({
+	// 				type: _CONSTANTS.CONSTANTS.CUE_VIDEO,
+	// 				videoId: currentSong.videoId
+	// 			});
+	// 		}
+	// 		this.store.dispatch((0, _WebviewActions.webviewReady)());
+	// 		break;
+	// 	default:
+	// 	// pass
+	// 		break;
+	// }
 }
 
 function listStorage(view) {
