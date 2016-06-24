@@ -22,8 +22,7 @@
     <link rel="stylesheet" type='text/css' href="library/font-awesome-4.6.3/css/font-awesome.min.css">
 </head>
 
-<body>
-
+  <body>
     <div id="header-wrapper">
       <div id="header-content" class="container-fluid">
         <div class="brand">Pear Music</div>
@@ -39,25 +38,16 @@
           <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
           <div class="menu-list">
               <ul id="menu-content" class="menu-content collapse out">
-                  <li  data-toggle="collapse" data-target="#products" class="collapsed">
-                    <a href="#"><i class="fa fa-gift fa-lg"></i> UI Elements <span class="arrow"></span></a>
+                  <li id="play-list-menu" data-toggle="collapse" data-target="#playlist-content" class="collapsed">
+                    <a href="#"><i class="fa fa-gift fa-lg"></i> My Play List <span class="arrow"></span></a>
                   </li>
-                  <ul class="sub-menu collapse" id="products">
-                      <li class="active"><a href="#">CSS3 Animation</a></li>
-                      <li><a href="#">General</a></li>
-                      <li><a href="#">Buttons</a></li>
+                  <ul class="sub-menu collapse" id="playlist-content">
                   </ul>
                   <li data-toggle="collapse" data-target="#service" class="collapsed">
                     <a href="#"><i class="fa fa-globe fa-lg"></i> Services <span class="arrow"></span></a>
                   </li>  
                   <ul class="sub-menu collapse" id="service">
                     <li>New Service 1</li>
-                  </ul>
-                  <li data-toggle="collapse" data-target="#new" class="collapsed">
-                    <a href="#"><i class="fa fa-car fa-lg"></i> New <span class="arrow"></span></a>
-                  </li>
-                  <ul class="sub-menu collapse" id="new">
-                    <li>New New 1</li>
                   </ul>
               </ul>
           </div>
@@ -68,23 +58,25 @@
           <ul id="searchContent" class="music-content">
           </ul>          
         </div>
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-lg-2">
-              RANK
-            </div>
-            <div class="col-lg-6">
-              SONG
-            </div>
-            <div class="col-lg-4">
-              ARTIST
-            </div>
-          </div>
+        <div id="main-content">
+          <table id="playlist-table" class="table table-condensed"> 
+            <thead class="table-head"> 
+              <tr> 
+                <th class="table-rank">RANK</th> 
+                <th class="table-name">SONG NAME</th> 
+                <th class="table-artist">CHANNEL</th> 
+              </tr> 
+            </thead> 
+            <tbody class="table-body"> 
+            </tbody> 
+          </table>
         </div>
       </div>
       <div id="video-wrapper">
-      <webview id="video-player" src="sandbox.html" partition="static" style="width:300px; height:200px" frameborder="0" allowtransparency="true"></webview>
-        <div id="controller"></div>
+        <webview id="video-player" src="sandbox.html" partition="static" style="width:300px; height:200px" frameborder="0" allowtransparency="true"></webview>
+        <div id="video-controller">
+          
+        </div>
       </div>
     </div>
     <!-- /#wrapper -->
@@ -101,6 +93,6 @@
     <script type="text/javascript" src="public/js/model.js"></script>
     <script type="text/javascript" src="public/js/view.js"></script>
 
-</body>
+  </body>
 
 </html>

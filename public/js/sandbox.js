@@ -70,7 +70,7 @@ var registerYouTubeEvents = function() {
   }
 
   window.onPlayerReady = function(event) {
-    event.target.playVideo();
+    // event.target.playVideo();
 
     // chrome.runtime.sendMessage(APP_ID, {data: CONSTANTS.PLAYER_READY});
     // event.target.setVolume(100);

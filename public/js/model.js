@@ -14,29 +14,44 @@ SandboxMessenger.prototype.sendMessage = function(msg){
 
 }
 
-
 SandboxMessenger.prototype.messageHandler = function(msg){
 
 }
 
-function listStorage() {
+function listStorage(view) {
 	var self = this;
-
+	this.view = view;
 	this.playlistContainer = {};
 
 	// chrome.storage.sync.clear();
 	chrome.storage.sync.get('listStorage', function(item){
 		if (Object.keys(item).length == 0){
-			self.playlistContainer["MyList"] = new videoStorage();
+			self.playlistContainer["MyList"] = new videoStorage(null, null, self);
 			self.saveStorage();
 		}else{
 			self.playlistContainer = item.listStorage;
+			self.initStorage();
 		}
+		self.view.playListSetUp();
 	});
 }
 
+listStorage.prototype.initStorage = function(){
+	var tempContainer = this.playlistContainer;
+	var playlistContainer = {};
+	var listKeys = Object.keys(tempContainer);
+	var numPlayLists = listKeys.length;
+
+	for (i=0;i<numPlayLists;i++){
+		console.log(listKeys[i], tempContainer[listKeys[i]].videoContainer);
+		this.playlistContainer[listKeys[i]] = new videoStorage(listKeys[i], tempContainer[listKeys[i]].videoContainer, this);
+	}
+
+	// this.playlistContainer = playlistContainer;
+}
+
 listStorage.prototype.saveStorage = function(){
-	chrome.storage.sync.set({'listStorage': this.playlistContainer}, this.saveStorageCallback);	
+	chrome.storage.sync.set({'listStorage': this.playlistContainer}, this.saveStorageCallback);
 }
 
 listStorage.prototype.saveStorageCallback = function(){
@@ -45,7 +60,6 @@ listStorage.prototype.saveStorageCallback = function(){
 
 listStorage.prototype.addList = function(playListName){
 	// Name duplicate Check
-
 	this.playlistContainer[playListName] = new videoStorage(playListName);
 	this.saveStorage();
 }
@@ -62,22 +76,26 @@ listStorage.prototype.changeListName = function(oldName, newName){
 	this.saveStorage();	
 }
 
-function videoStorage(name) {
+function videoStorage(name, videoContainer, listStorage) {
 	var self = this;
+	this.listStorage = listStorage
 	this.name = (name) ? name : "MyList";
-	this.videoContainer = {};
+	this.videoContainer = (videoContainer) ? videoContainer : {};
 }
 
 videoStorage.prototype.changeName = function(newName){
 	this.name = newName;
+	this.listStorage.saveStorage();
 }
 
-videoStorage.prototype.addVideo = function(videoID, videoTitle, videoArtist) {
-	this.videoContainer[videoID] = {"id": videoID, "title": videoTitle, "artist": videoArtist};
+videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
+	this.videoContainer[videoID] = {"id": videoID, "name": videoName, "artist": videoArtist};
+	this.listStorage.saveStorage();
 }
 
 videoStorage.prototype.removeVideo = function(videoID) {
 	delete this.videoContainer[videoID]
+	this.listStorage.saveStorage();
 }
 
 
