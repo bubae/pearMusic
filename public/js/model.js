@@ -1,11 +1,3 @@
-function YoutubePlayer() {
-  // this.operatorNeedsReset = true;
-  // this.operandNeedsReset = true;
-  // this.accumulatorNeedsReset = true;
-  // this.decimal = -1;
-  // this.ResetRegisters();
-}
-
 function SandboxMessenger() {
 
 }
