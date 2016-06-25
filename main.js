@@ -13,13 +13,13 @@
 chrome.app.runtime.onLaunched.addListener(function() {
 	var screenWidth = screen.availWidth;
 	var screenHeight = screen.availHeight;
-	width = 1200;
-	height = 800;
+	width = 1080;
+	height = 720;
 	chrome.app.window.create('pear_music.html', {
 		id: "pearMusicID",
 		outerBounds: {
-			'width': 1200,
-			'height': 800,
+			'width': width,
+			'height': height,
 			minWidth: 764,
 			minHeight: 600,
 			left: Math.round((screenWidth-width)/2),

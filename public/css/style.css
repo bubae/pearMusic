@@ -274,6 +274,32 @@ body{
   transition: all 0.5s ease;
 }
 
+#video-player {
+  position: fixed;
+  width: 300px;
+  height: 200px;
+}
+
+#video-wrapper .big-video{
+  position: static;
+  width: 100% !important;
+  height: 480px !important;
+}
+
+#video-wrapper .big-video #video-player{
+
+}
+
+#video-wrapper .full-video{
+  background-color: black;
+  width: 100%;  
+}
+
+#video-wrapper .full-video #video-player{
+  
+}
+
+
 #wrapper.toggled #sidebar-wrapper {
     width: 270px;
 }
@@ -284,6 +310,31 @@ body{
   width: 270px;
   margin: 0;
   padding: 0;
+}
+
+#video-size-btn{
+  margin-top: 200px;
+  padding: 5px 0;
+  background-color: black;
+  text-align: right;
+  color: white;  
+}
+
+#video-size-btn .video-big{
+  width: 100%;
+  margin-top: 0;
+}
+
+#video-size-btn .video-full{
+  position: fixed;
+  width: 100%;
+  bottom: 0;  
+}
+
+#video-size-btn .video-size-icon{
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 14px;  
 }
 
 .nav-side-menu .menu-list .menu-content {
