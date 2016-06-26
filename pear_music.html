@@ -16,7 +16,7 @@
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" type="text/css" href="library/bootstrap-3.3.6/css/bootstrap.min.css" />
-    <!--<link rel="stylesheet" type="text/css" href="library/bootstrap-3.3.6/css/bootstrap-theme.min.css" />-->
+
     <!--Fonts-->
     <link rel='stylesheet' type='text/css' href='public/css/font.css' >
     <link rel="stylesheet" type='text/css' href="library/font-awesome-4.6.3/css/font-awesome.min.css">
@@ -28,7 +28,7 @@
         <div class="brand">Pear Music</div>
         <div id="searchForm" class="pull-left">
           <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-          <input id=searchBox type="text" class="empty" placeholder="Search" autocomplete="off">
+          <input id="searchBox" type="text" class="empty" placeholder="Search" autocomplete="off">
         </div>
       </div>
     </div>
@@ -72,15 +72,65 @@
           </table>
         </div>
       </div>
+
       <div id="video-wrapper">
-        <webview id="video-player" src="sandbox.html" partition="static" style="width:300px; height:200px" frameborder="0" allowtransparency="true"></webview>
+        <webview id="video-player" src="sandbox.html" partition="static" frameborder="0" allowtransparency="true"></webview>
         <div id="video-size-btn">
           <i class="fa fa-compress fa-fw video-size-icon small hidden" data-reactid=".0.4.2.0"></i>
           <i class="fa fa-expand fa-fw video-size-icon big " data-reactid=".0.4.2.1"></i>
           <i class="fa fa-arrows-alt fa-fw video-size-icon full" data-reactid=".0.4.2.2"></i>
         </div>
       </div>
+
+      <div id="right-sidebar">
+        <div id="video-controller">
+          <div class="song-display small-video">
+            <div class="song-title truncate extra-margin-top"></div>
+            <div class="song-artist truncate"></div>
+          </div>
+          <div class="player-controls">
+            <i class="fa fa-step-backward fa-fw"></i>
+            <i class="fa fa-play fa-fw control-center-icon"></i>
+            <i class="fa fa-pause fa-fw control-center-icon hidden"></i>
+            <i class="fa fa-step-forward fa-fw"></i>
+          </div>
+          <div class="aux-controls clearfix">
+            <div class="aux-controls-inner-wrapper">
+              <i class="fa fa-fw fa-random toggle-shuffle-btn"></i>
+              <i class="fa fa-fw fa-repeat toggle-repeat-btn"></i>
+                <div class="volume-control">
+                  <i class="fa fa-fw volume-btn fa-volume-up"></i>
+                  <span class="volume-control-slider-container">
+                    <input class="volume-control-slider" type="range" min="0" max="100" step="1" value="100">
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- addList Modal -->
+    <div class="modal fade" id="addListModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="list-name" class="control-label">List Name</label>
+                <input type="text" class="form-control" id="list-name">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="addListBtn" class="btn btn-primary">Create List</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- /#wrapper -->
 
     <!-- jQuery -->

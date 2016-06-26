@@ -16,15 +16,15 @@ var CONSTANTS = {
 };
 
 var messageHandler = function(rawMsg) {
-  console.log(rawMsg)
+  // console.log(rawMsg)
   var msg = rawMsg.data;
   switch (msg.type) {
     case CONSTANTS.LOAD_VIDEO:
-      player.loadVideoById(msg.videoId);
-      // ga('send', 'event', 'YT', 'playVideo', msg.videoId);
+      player.loadVideoById(msg.videoId, 0, 'small');
       break;
     case CONSTANTS.CUE_VIDEO:
-      player.cueVideoById(msg.videoId);
+      console.log("cuEE", rawMsg);
+      player.cueVideoById(msg.videoId, 0, 'small');
       break;
     case CONSTANTS.SET_VOLUME:
       player.setVolume(msg.volume);
@@ -40,9 +40,6 @@ var messageHandler = function(rawMsg) {
         player.playVideo();
       }
       break;
-    // case CONSTANTS.REPORT_TO_GA:
-    //   ga('send', 'event', msg.category, msg.action, msg.label);
-    //   break;
     default:
       break;
   }
@@ -72,17 +69,17 @@ var registerYouTubeEvents = function() {
   window.onPlayerReady = function(event) {
     // event.target.playVideo();
 
-    // chrome.runtime.sendMessage(APP_ID, {data: CONSTANTS.PLAYER_READY});
+    chrome.runtime.sendMessage(APP_ID, {data: CONSTANTS.PLAYER_READY});
     // event.target.setVolume(100);
     // $('#player').removeAttr("width").removeAttr("height");
   }
 
   window.onPlayerStateChange = function(event) {
-    // chrome.runtime.sendMessage(APP_ID, event);
+    chrome.runtime.sendMessage(APP_ID, event);
   }
 
   window.onPlayerError = function(event) {
-    // chrome.runtime.sendMessage(APP_ID, {data: CONSTANTS.ERROR_CODE});
+    chrome.runtime.sendMessage(APP_ID, {data: CONSTANTS.ERROR_CODE});
   }
 }
 

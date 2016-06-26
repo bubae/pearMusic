@@ -1,34 +1,138 @@
 var app_key = "AIzaSyBjSx3cD_ArNqKRGFGlVzBQl-N7h16EU8Q";
 
 function View() {
-	var player = this;
+	var self = this;
 
 	this.searchBox = $('#searchBox');
 	this.searchResult = $('#searchResult');
 	this.searchContent = $('#searchContent');
 	this.playListContent = $('#playlist-content');
+	this.pageWapper = $('#page-wrapper');
+	this.videoWapper = $('#video-wrapper');
+	this.videoPlayerDOM = $('#video-player');
+	this.videoSizeBtn = $('#video-size-btn');
+	this.videoControllerDOM = $('#video-controller');
+
+
+	this.sizeBtnSmall = $('.video-size-icon.small');
+	this.sizeBtnBig = $('.video-size-icon.big');
+	this.sizeBtnFull = $('.video-size-icon.full');
+	this.addListBtnDOM = $('#addListBtn');
+
+
 	this.lastDisplayElement = null;
 	this.currentPlayList = null;
 	this.numPlayEntry = null;
 	this.store = new listStorage(this);
-	this.sandbox = new SandboxMessenger();
+	this.videoPlayer = new videoPlayer(this);
 	
+
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
-			// player.searchContent[0].innerHTML = '';
+			player.searchContent[0].innerHTML = '';
 		}
 	});
 
 	$("#searchBox").keydown(function(event){
 	    if(event.keyCode == 13){
 	    	if ($("#searchBox")[0].value.length > 1) {
-		        player.videoSearch($("#searchBox")[0].value);
+		        self.videoSearch($("#searchBox")[0].value);
 		        $("#searchBox")[0].value = "";
 	    	}
 	    }
 	});
 
+	$( window ).resize(function() {
+		self.videoPlayer.setWindowSize(self.videoPlayerDOM.width(), self.videoPlayerDOM.height())
+	});
+
+
+	this.addListBtnDOM.on('click', function(){
+		var listName = $('#list-name')[0];
+
+		self.store.addList(listName.value);
+		listName.value = "";
+		$('#addListModal').modal('hide');
+
+		self.playListSetUp();
+	});
+
+	this.smallVideoView = this.smallVideoView.bind(this);
+	this.bigVideoView = this.bigVideoView.bind(this);
+	this.fullVideoView = this.fullVideoView.bind(this);
+
+	this.viewSizeBtnEventSetUp();
 	this.videoListEventSetUp();
+}
+
+View.prototype.viewSizeBtnEventSetUp = function(){
+	var self = this;
+
+	this.sizeBtnSmall.on('click',this.smallVideoView);
+	this.sizeBtnBig.on('click',this.bigVideoView);
+	this.sizeBtnFull.on('click',this.fullVideoView);
+}
+
+View.prototype.smallVideoView = function(){
+
+	this.videoControllerDOM.removeClass("full-video");
+	this.videoControllerDOM.removeClass("big-video");
+
+	this.pageWapper.removeClass("full-video");
+	this.pageWapper.removeClass("big-video");
+
+	this.videoWapper.removeClass("full-video");
+	this.videoWapper.removeClass("big-video");
+
+	this.videoSizeBtn.removeClass("video-full");
+	this.videoSizeBtn.removeClass("video-big");
+
+	this.sizeBtnBig.removeClass("hidden");
+	this.sizeBtnFull.removeClass("hidden");
+	this.sizeBtnSmall.addClass("hidden")
+	this.videoPlayer.setWindowSize(this.videoPlayerDOM.width(), this.videoPlayerDOM.height());
+}
+
+View.prototype.bigVideoView = function(){
+
+	this.videoControllerDOM.removeClass("full-video");
+	this.videoControllerDOM.addClass("big-video");
+
+	this.pageWapper.removeClass("full-video");
+	this.pageWapper.addClass("big-video");
+
+	this.videoWapper.removeClass("full-video");
+	this.videoWapper.addClass("big-video");
+
+	this.videoSizeBtn.removeClass("video-full")
+	this.videoSizeBtn.addClass("video-big")
+
+	this.sizeBtnSmall.removeClass("hidden");
+	this.sizeBtnFull.removeClass("hidden");
+	this.sizeBtnBig.addClass("hidden")
+
+	this.videoPlayer.setWindowSize(this.videoPlayerDOM.width(), this.videoPlayerDOM.height());
+}
+
+View.prototype.fullVideoView = function(){
+
+	this.videoControllerDOM.removeClass("big-video");
+	this.videoControllerDOM.addClass("full-video");
+
+	this.pageWapper.removeClass("big-video");
+	this.pageWapper.addClass("full-video");
+
+	this.videoWapper.removeClass("big-video");
+	this.videoWapper.addClass("full-video");
+
+	this.videoSizeBtn.removeClass("video-big")
+	this.videoSizeBtn.addClass("video-full")
+
+	this.sizeBtnSmall.removeClass("hidden");
+	this.sizeBtnBig.addClass("hidden");
+	this.sizeBtnFull.addClass("hidden")
+
+	this.videoPlayer.setWindowSize(this.videoPlayerDOM.width(), this.videoPlayerDOM.height());
 }
 
 View.prototype.videoSearch = function(searchText){
@@ -73,7 +177,9 @@ View.prototype.searchResultShow = function(searchData){
 
 
 View.prototype.playListSetUp = function(){
-	var liTemplate = '<li class="{{class}}"><a href="#">{{listName}}</a></li>'
+	var liTemplate = '<li class="{{class}} playlist" data-name="{{listName}}"><a href="#">{{listName}}</a></li>'
+	var addButtonHTML = '<li class="addList"><a href="#"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> ADD LIST</a></li>'
+
 	var playListMenuDOM = $('#play-list-menu')
 	var playLists = this.store.playlistContainer;
 	var listKeys = Object.keys(playLists);
@@ -92,14 +198,15 @@ View.prototype.playListSetUp = function(){
 			liClass="active";
 			defaultListName = playLists[listKeys[i]].name;
 		}
-		liInnerHTML = liInnerHTML + liTemplate.replace("{{class}}", liClass).replace("{{listName}}",playLists[listKeys[i]].name);
+		liInnerHTML = liInnerHTML + liTemplate.replace("{{class}}", liClass).replace(/{{listName}}/g, playLists[listKeys[i]].name);
 	}
-	this.playListContent[0].innerHTML = liInnerHTML;
+	this.playListContent[0].innerHTML = liInnerHTML + addButtonHTML;
 	this.playListContent.collapse()
-	playListEventSetUp();
 
-	this.currentPlayList = playLists[defaultListName];
-	this.videoListSetUp(defaultListName);
+	this.currentPlayList = this.currentPlayList ? this.currentPlayList : playLists[defaultListName];
+
+	this.playListEventSetUp();
+	this.videoListSetUp(this.currentPlayList.name);
 };
 
 View.prototype.videoListSetUp = function(playListName){
@@ -126,8 +233,10 @@ View.prototype.videoListSetUp = function(playListName){
 		tableInnerHTML = tableInnerHTML + trTemplate.replace("{{videoID}}",item.id).replace("{{index}}", i+1).replace("{{videoName}}", item.name).replace("{{artist}}", item.artist);
 	}
 
-	this.numPlayEntry = numList
+	this.numPlayEntry = numList;
 	playListTableDOM[0].innerHTML = tableInnerHTML;
+
+	this.videoPlayer.setPlayList(playLists[playListName]);
 	this.videoListEventSetUp();
 };
 
@@ -153,17 +262,33 @@ View.prototype.searchContentEventSetUp = function(){
 		dataset = $(this)[0].dataset;
 		self.searchContent[0].innerHTML = '';
 		self.currentPlayList.addVideo(dataset.id, dataset.title, dataset.artist);
-		self.videoListAdd(dataset.id, dataset.title, dataset.artist)
+		self.store.saveStorage();
+
+		// self.videoListAdd(dataset.id, dataset.title, dataset.artist)		
+		self.videoListSetUp(self.currentPlayList.name);
 	});
 };
 
-function playListEventSetUp(){
+View.prototype.playListEventSetUp = function(){
+	var self = this;
 
+	$('#playlist-content .playlist').on('click', function(){
+		self.currentPlayList = self.store.playlistContainer[$(this)[0].dataset.name];
+		$('#playlist-content .playlist').removeClass('active');
+		$(this).addClass('active');
+
+		self.videoListSetUp($(this)[0].dataset.name);
+	});
+
+	$('#playlist-content .addList').on('click', function(){
+		$('#addListModal').modal('show');
+	});
 }
 
 View.prototype.videoListEventSetUp = function(){
+	var self = this;
 	$("#playlist-table tbody tr").click(function() {
-		console.log($(this)[0].dataset);
+		self.videoPlayer.loadVideo($(this)[0].dataset.videoid);
 	});	
 }
 
