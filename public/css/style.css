@@ -3,9 +3,7 @@ html{
 }
 
 body{
-  min-width:1000px; /* suppose you want minimun width of 1000px */
   width: auto !important;  /* Firefox will set width as auto */
-  width:1000px;             /* As IE ignores !important it will set width as 1000px; */
   height: 100%;
   background-color: #1A263D !important;
 }
@@ -279,6 +277,20 @@ body{
   width: 300px;
   overflow-y: hidden;
   height: 100%;
+}
+
+#playListContextMenu {
+  position: absolute;
+  z-index: 1080;
+  background-color: #dddddd;
+  color: #111111; 
+}
+
+#videoListContextMenu {
+  position: absolute;
+  z-index: 1080;
+  background-color: #dddddd;
+  color: #111111; 
 }
 
 

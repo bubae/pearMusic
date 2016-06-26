@@ -175,7 +175,7 @@ videoPlayer.prototype.listCueSetUp = function(){
 	this.numList = this.playCue.length;
 
 	// console.log(this.playCue, this.currentIndex);
-	this.cueVideo(this.playCue[this.currentIndex]);
+	// this.cueVideo(this.playCue[this.currentIndex]);
 }
 
 videoPlayer.prototype.getState = function(){

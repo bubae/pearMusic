@@ -13,12 +13,13 @@ function View() {
 	this.videoSizeBtn = $('#video-size-btn');
 	this.videoControllerDOM = $('#video-controller');
 
+	this.playListContextMenuDOM = $('#playListContextMenu');
+	this.videoListContextMenuDOM = $('#videoListContextMenu');
 
 	this.sizeBtnSmall = $('.video-size-icon.small');
 	this.sizeBtnBig = $('.video-size-icon.big');
 	this.sizeBtnFull = $('.video-size-icon.full');
 	this.addListBtnDOM = $('#addListBtn');
-
 
 	this.lastDisplayElement = null;
 	this.currentPlayList = null;
@@ -26,6 +27,15 @@ function View() {
 	this.store = new listStorage(this);
 	this.videoPlayer = new videoPlayer(this);
 	
+
+	$(document).click(function(evt){
+        self.contextMenuClear();
+	});
+
+	// $(document).contextmenu(function(evt){
+	// 	if (self.playListContextMenuDOM.addClass("display") == "inline")
+ //        self.playListContextMenuDOM.addClass("display", "none");
+	// });
 
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
@@ -280,6 +290,20 @@ View.prototype.playListEventSetUp = function(){
 		self.videoListSetUp($(this)[0].dataset.name);
 	});
 
+	$('#playlist-content .playlist').contextmenu(function(evt){
+		self.contextMenuClear();
+        var posx = evt.clientX +window.pageXOffset +'px'; //Left Position of Mouse Pointer
+        var posy = evt.clientY + window.pageYOffset + 'px'; //Top Position of Mouse Pointer
+
+        self.playListContextMenuDOM.css("display", "inline");
+        self.playListContextMenuDOM.css("left", posx);
+        self.playListContextMenuDOM.css("top", posy);
+
+		evt.preventDefault();
+		// console.log(a,b);
+		// console.log(this);
+	});
+
 	$('#playlist-content .addList').on('click', function(){
 		$('#addListModal').modal('show');
 	});
@@ -287,9 +311,27 @@ View.prototype.playListEventSetUp = function(){
 
 View.prototype.videoListEventSetUp = function(){
 	var self = this;
+
 	$("#playlist-table tbody tr").click(function() {
 		self.videoPlayer.loadVideo($(this)[0].dataset.videoid);
 	});	
+
+	$("#playlist-table tbody tr").contextmenu(function(evt){
+		self.contextMenuClear();
+        var posx = evt.clientX +window.pageXOffset +'px'; //Left Position of Mouse Pointer
+        var posy = evt.clientY + window.pageYOffset + 'px'; //Top Position of Mouse Pointer
+      
+		self.videoListContextMenuDOM.css("display", "inline");
+        self.videoListContextMenuDOM.css("left", posx);
+        self.videoListContextMenuDOM.css("top", posy);
+		evt.preventDefault();
+	});	
+}
+
+View.prototype.contextMenuClear = function(){
+	var self = this;
+    self.playListContextMenuDOM.css("display", "none");	
+    self.videoListContextMenuDOM.css("display", "none");	
 }
 
 function noSearchResult(){
