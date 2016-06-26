@@ -20,7 +20,9 @@ function View() {
 	this.sizeBtnBig = $('.video-size-icon.big');
 	this.sizeBtnFull = $('.video-size-icon.full');
 	this.addListBtnDOM = $('#addListBtn');
+	this.renameListBtnDOM = $('#renameListBtn');
 
+	this.selectedItem = null;
 	this.lastDisplayElement = null;
 	this.currentPlayList = null;
 	this.numPlayEntry = null;
@@ -39,7 +41,7 @@ function View() {
 
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
-			player.searchContent[0].innerHTML = '';
+			self.searchContent[0].innerHTML = '';
 		}
 	});
 
@@ -57,11 +59,31 @@ function View() {
 	});
 
 
+	$('#list-name').keydown(function(event){
+		if(event.keyCode == 13){
+			if(!self.addListBtnDOM.hasClass('hidden')){
+				self.addListBtnDOM.click();
+			}else if(!self.renameListBtnDOM.hasClass('hidden')){
+				self.renameListBtnDOM.click();
+			}
+			event.preventDefault();
+		}
+	})
 	this.addListBtnDOM.on('click', function(){
 		var listName = $('#list-name')[0];
 
 		self.store.addList(listName.value);
 		listName.value = "";
+		$('#addListModal').modal('hide');
+
+		self.playListSetUp();
+	});
+
+	this.renameListBtnDOM.on('click', function(){
+		var newName = $('#list-name')[0];
+		var oldName = self.selectedItem[0].dataset.name;
+		self.store.changeListName(oldName, newName.value);
+		newName.value = "";
 		$('#addListModal').modal('hide');
 
 		self.playListSetUp();
@@ -73,6 +95,7 @@ function View() {
 
 	this.viewSizeBtnEventSetUp();
 	this.videoListEventSetUp();
+	this.contextEventSetUp();
 }
 
 View.prototype.viewSizeBtnEventSetUp = function(){
@@ -178,7 +201,6 @@ View.prototype.searchResultShow = function(searchData){
 		videoID = vidoeInfos[i].id.videoId;
 		addItem = searchContentTemplate.replace(/{{title}}/g, title).replace("{{videoID}}",videoID).replace("{{desc}}", desc).replace("{{artist}}", artist);
 		allContent = allContent + addItem;		
-		// console.log(vidoeInfos[i])
 	}
 	searchContent[0].innerHTML = allContent;
 	core.searchContentEventSetUp();
@@ -220,7 +242,7 @@ View.prototype.playListSetUp = function(){
 };
 
 View.prototype.videoListSetUp = function(playListName){
-	var trTemplate = '<tr data-videoID="{{videoID}}">'
+	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
 	    + '<th scope="row" class="table-rank">{{index}}</th>'
         + '<td class="table-name">{{videoName}}</td>'
         + '<td class="table-artist">{{artist}}</td>'
@@ -240,7 +262,7 @@ View.prototype.videoListSetUp = function(playListName){
 
 	for (i=0;i<numList;i++){
 		item = selectedPlayList[listKeys[i]];
-		tableInnerHTML = tableInnerHTML + trTemplate.replace("{{videoID}}",item.id).replace("{{index}}", i+1).replace("{{videoName}}", item.name).replace("{{artist}}", item.artist);
+		tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g,item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.name).replace(/{{artist}}/g, item.artist);
 	}
 
 	this.numPlayEntry = numList;
@@ -251,7 +273,7 @@ View.prototype.videoListSetUp = function(playListName){
 };
 
 View.prototype.videoListAdd = function(id, title, artist){
-	var trTemplate = '<tr data-videoID="{{videoID}}">'
+	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
 	    + '<th scope="row" class="table-rank">{{index}}</th>'
         + '<td class="table-name">{{videoName}}</td>'
         + '<td class="table-artist">{{artist}}</td>'
@@ -259,7 +281,7 @@ View.prototype.videoListAdd = function(id, title, artist){
 
     var playListTableDOM = $('#playlist-table tbody');
 
-	playListTableDOM[0].innerHTML = playListTableDOM[0].innerHTML + trTemplate.replace("{{videoID}}",id).replace("{{index}}", this.numPlayEntry+1).replace("{{videoName}}", title).replace("{{artist}}", artist);
+	playListTableDOM[0].innerHTML = playListTableDOM[0].innerHTML + trTemplate.replace(/{{videoID}}/g,id).replace(/{{index}}/g, this.numPlayEntry+1).replace(/{{videoName}}/g, title).replace(/{{artist}}/g, artist);
 	this.numPlayEntry = this.numPlayEntry + 1;
 	this.videoListEventSetUp();
 }
@@ -292,6 +314,8 @@ View.prototype.playListEventSetUp = function(){
 
 	$('#playlist-content .playlist').contextmenu(function(evt){
 		self.contextMenuClear();
+		self.selectedItem = $(this);
+
         var posx = evt.clientX +window.pageXOffset +'px'; //Left Position of Mouse Pointer
         var posy = evt.clientY + window.pageYOffset + 'px'; //Top Position of Mouse Pointer
 
@@ -300,11 +324,13 @@ View.prototype.playListEventSetUp = function(){
         self.playListContextMenuDOM.css("top", posy);
 
 		evt.preventDefault();
-		// console.log(a,b);
-		// console.log(this);
 	});
 
 	$('#playlist-content .addList').on('click', function(){
+		self.addListBtnDOM.removeClass('hidden');
+		self.renameListBtnDOM.addClass('hidden');
+
+		$('#list-name').focus();
 		$('#addListModal').modal('show');
 	});
 }
@@ -318,6 +344,7 @@ View.prototype.videoListEventSetUp = function(){
 
 	$("#playlist-table tbody tr").contextmenu(function(evt){
 		self.contextMenuClear();
+		self.selectedItem = $(this);
         var posx = evt.clientX +window.pageXOffset +'px'; //Left Position of Mouse Pointer
         var posy = evt.clientY + window.pageYOffset + 'px'; //Top Position of Mouse Pointer
       
@@ -334,11 +361,41 @@ View.prototype.contextMenuClear = function(){
     self.videoListContextMenuDOM.css("display", "none");	
 }
 
+View.prototype.contextEventSetUp = function(){
+	var self = this;
+
+	$('#playListContextMenu .itemRename').on('click', function(){
+		self.addListBtnDOM.addClass('hidden');
+		self.renameListBtnDOM.removeClass('hidden');
+		$('#list-name').focus();
+		$('#addListModal').modal('show');
+	});
+
+	$('#playListContextMenu .listDelete').on('click', function(){
+		var listName = self.selectedItem[0].dataset.name;
+		self.store.removeList(listName);
+		self.currentPlayList = null;
+		self.playListSetUp();
+	});
+
+	$('#videoListContextMenu .addVideo').on('click', function(){
+		var dataset = self.selectedItem[0].dataset;
+		self.currentPlayList.addVideo(dataset.videoid, dataset.name, dataset.artist);
+		self.videoListSetUp(self.currentPlayList.name);
+	});
+
+	$('#videoListContextMenu .removeVideo').on('click', function(){
+		var dataset = self.selectedItem[0].dataset;
+		self.currentPlayList.removeVideo(dataset.videoid);
+		self.videoListSetUp(self.currentPlayList.name);
+	});
+
+}
+
 function noSearchResult(){
 
 }
 
 function errorNoti(data) {
-	// console.log("Video Search Error");
-	// console.log(data);
+	console.log("Video Search Error");
 }

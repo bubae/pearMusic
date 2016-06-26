@@ -473,6 +473,24 @@ input.volume-control-slider {
   font-size: 14px;  
 }
 
+.contextMenu {
+
+}
+
+.contextMenu td{
+  height: 20px ;
+  cursor: pointer;
+  padding-left: 10px;
+  border-bottom : 1px solid #4f5b69;
+  background-color: #eeeeee;
+  color: #000000;
+}
+
+.contextMenu td:hover{
+  background-color: #23282e;
+  color: #ffffff;
+}
+
 .nav-side-menu .menu-list .menu-content {
   display: block;
 }
