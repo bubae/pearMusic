@@ -52,6 +52,10 @@ body{
   transition: all 0.5s ease;
 }
 
+#searchThumbnail{
+  z-index: 1080;
+}
+
 #searchForm {
   padding-left: 10px;
 }
@@ -371,6 +375,7 @@ body{
 .volume-btn {
     float: left;
     margin-left: 10px;
+    cursor: pointer;
 }
 
 .volume-control-slider-container {

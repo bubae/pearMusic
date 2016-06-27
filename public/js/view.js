@@ -16,11 +16,14 @@ function View() {
 	this.playListContextMenuDOM = $('#playListContextMenu');
 	this.videoListContextMenuDOM = $('#videoListContextMenu');
 
+	this.imgThumbnail = $('#searchThumbnail');
+
 	this.sizeBtnSmall = $('.video-size-icon.small');
 	this.sizeBtnBig = $('.video-size-icon.big');
 	this.sizeBtnFull = $('.video-size-icon.full');
 	this.addListBtnDOM = $('#addListBtn');
 	this.renameListBtnDOM = $('#renameListBtn');
+	this.melonChartDOM = $('#melon-chart');
 
 	this.selectedItem = null;
 	this.lastDisplayElement = null;
@@ -29,11 +32,14 @@ function View() {
 	this.store = new listStorage(this);
 	this.videoPlayer = new videoPlayer(this);
 	
-	// this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
+	this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
 
-	// this.melon.TopDailySongs(50, 1, function(json){
-		// console.log(json);
-	// })
+	self.melon.RealTimeCharts(100, 1, function(res){
+		self.melon.rtChart = res;
+		console.log(res);
+		// self.melonListSetUp();
+	});
+
 	$(document).click(function(evt){
         self.contextMenuClear();
 	});
@@ -46,13 +52,14 @@ function View() {
 	$(document).keydown(function(event) {
 		if (event.keyCode == 27) {
 			self.searchContent[0].innerHTML = '';
+			self.imgThumbnail.addClass('hidden');
 		}
 	});
 
 	$("#searchBox").keydown(function(event){
 	    if(event.keyCode == 13){
 	    	if ($("#searchBox")[0].value.length > 1) {
-		        self.videoSearch($("#searchBox")[0].value);
+		        self.videoSearch($("#searchBox")[0].value, self.searchResultShow);
 		        $("#searchBox")[0].value = "";
 	    	}
 	    }
@@ -100,6 +107,7 @@ function View() {
 	this.viewSizeBtnEventSetUp();
 	this.videoListEventSetUp();
 	this.contextEventSetUp();
+	this.chartEventSetUp();
 }
 
 View.prototype.viewSizeBtnEventSetUp = function(){
@@ -172,7 +180,8 @@ View.prototype.fullVideoView = function(){
 	this.videoPlayer.setWindowSize(this.videoPlayerDOM.width(), this.videoPlayerDOM.height());
 }
 
-View.prototype.videoSearch = function(searchText){
+View.prototype.videoSearch = function(searchText, callback){
+	console.log(searchText)
 	template_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q={{searchText}}&key={{app_key}}";
 
 	search_url = template_url.replace("{{searchText}}", searchText).replace("{{app_key}}", app_key);
@@ -182,28 +191,29 @@ View.prototype.videoSearch = function(searchText){
 		dataType: "json",
 		url: search_url,
 		// data: “id=”+id.val()+”&password=”+password.val()+”&name=”+name.val(),
-		success: this.searchResultShow,
+		success: callback,
 		error: errorNoti
 	}); 	
 };
 
 View.prototype.searchResultShow = function(searchData){
 	searchContent = $('#searchContent');
-	searchContentTemplate = '<li data-id="{{videoID}}" data-title="{{title}}" data-artist="{{artist}}"><div class="title">{{title}}</div><div class="desc">{{desc}}</div></li>';
+	searchContentTemplate = '<li data-thumbnail="{{thumbnail}}" data-id="{{videoID}}" data-title="{{title}}" data-artist="{{artist}}"><div class="title">{{title}}</div><div class="desc">{{desc}}</div></li>';
 	if (searchData == []){
 		core.noSearchResult();
 		return;
 	}
 
 	searchContent[0].innerHTML = '';
-	var vidoeInfos = searchData.items;
+	var videoInfos = searchData.items;
+	console.log(videoInfos[0].snippet.thumbnails.medium.url);
 	allContent = "";
-	for (i = 0; i < vidoeInfos.length; i++) {
-		title = vidoeInfos[i].snippet.title;
-		desc = vidoeInfos[i].snippet.description;
-		artist = vidoeInfos[i].snippet.channelTitle;
-		videoID = vidoeInfos[i].id.videoId;
-		addItem = searchContentTemplate.replace(/{{title}}/g, title).replace("{{videoID}}",videoID).replace("{{desc}}", desc).replace("{{artist}}", artist);
+	for (i = 0; i < videoInfos.length; i++) {
+		title = videoInfos[i].snippet.title;
+		desc = videoInfos[i].snippet.description;
+		artist = videoInfos[i].snippet.channelTitle;
+		videoID = videoInfos[i].id.videoId;
+		addItem = searchContentTemplate.replace("{{thumbnail}}", videoInfos[i].snippet.thumbnails.medium.url).replace(/{{title}}/g, title).replace("{{videoID}}",videoID).replace("{{desc}}", desc).replace("{{artist}}", artist);
 		allContent = allContent + addItem;		
 	}
 	searchContent[0].innerHTML = allContent;
@@ -297,12 +307,28 @@ View.prototype.searchContentEventSetUp = function(){
 	$("#searchContent li").click(function() {
 		dataset = $(this)[0].dataset;
 		self.searchContent[0].innerHTML = '';
+		self.imgThumbnail.addClass('hidden');
 		self.currentPlayList.addVideo(dataset.id, dataset.title, dataset.artist);
 		self.store.saveStorage();
 
 		// self.videoListAdd(dataset.id, dataset.title, dataset.artist)		
 		self.videoListSetUp(self.currentPlayList.name);
 	});
+
+	$("#searchContent li").hover(function() {
+		var top = $(this).offset().top;
+		var left = $(this).offset().left + 285;
+
+		self.imgThumbnail.css('position', 'absolute');
+		self.imgThumbnail.css('top', top);
+		self.imgThumbnail.css('left', left);
+
+		setThumbnail($(this)[0].dataset.thumbnail);
+		self.imgThumbnail.removeClass("hidden");
+	}, function(){
+		self.imgThumbnail.addClass("hidden");		
+	});
+
 };
 
 View.prototype.playListEventSetUp = function(){
@@ -396,10 +422,66 @@ View.prototype.contextEventSetUp = function(){
 
 }
 
+View.prototype.chartEventSetUp = function() {
+	var self = this;
+
+	this.melonChartDOM.on('click', function(){
+		self.melon.RealTimeCharts(100, 1, function(res){
+			self.melon.rtChart = res;
+			self.melonListSetUp();
+		});
+	});
+}
+
+View.prototype.melonListSetUp = function(){
+	var self = this;
+	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	    + '<th scope="row" class="table-rank">{{index}}</th>'
+        + '<td class="table-name">{{videoName}}</td>'
+        + '<td class="table-artist">{{artist}}</td>'
+        + '</tr>';
+    var playListTableDOM = $('#playlist-table tbody');
+	var chartList = this.melon.rtChart;
+
+	var tableInnerHTML = "";
+	console.log("melon");
+	for (i=0;i<chartList.length;i++){
+		item = chartList[i];
+		var artist = "";
+		for (j=0;j<item.artists.artist.length;j++){
+			artist = artist + item.artists.artist[j].artistName + ', ';			
+		}
+		artist = artist.slice(0,-2);
+
+		self.videoSearch(item.songName + " " + artist, function(searchData){
+			console.log(searchData)
+			tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g, searchData.items[0].id.videoId).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.songName).replace(/{{artist}}/g, artist);
+			if (i==99){
+				playListTableDOM[0].innerHTML = tableInnerHTML;
+				self.videoListEventSetUp();				
+			};
+		});
+	}
+
+}
+
 function noSearchResult(){
 
 }
 
 function errorNoti(data) {
 	console.log("Video Search Error");
+}
+
+
+function setThumbnail(url){
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', url, true);
+	xhr.responseType = 'blob';
+	xhr.onload = function(e) {
+	  var img = document.getElementById('thumbnailImg');
+	  img.src = window.URL.createObjectURL(this.response);
+	  // document.body.appendChild(img);
+	};
+	xhr.send();	
 }

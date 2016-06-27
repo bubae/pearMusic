@@ -103,6 +103,7 @@ function videoPlayer(view) {
 	this.randomToggleBtnDOM = $('.toggle-shuffle-btn');
 	this.repeatToggleBtnDOM = $('.toggle-repeat-btn');
 	this.volumeControlSliderDOM = $('.volume-control-slider');
+	this.volumeBtn = $('.volume-control .volume-btn');
 
 	this.currentPlayList = null;
 	this.currentVideo = null;
@@ -159,8 +160,38 @@ videoPlayer.prototype.controlEventSetUp = function(){
 		}
 	});
 
+	this.volumeBtn.on('click', function(){
+		var value = self.volumeControlSliderDOM[0].value;
+		if (value > 0){
+			self.volumeControlSliderDOM.val(0);
+			self.volumeBtn.removeClass('fa-volume-up');
+			self.volumeBtn.addClass('fa-volume-off');
+			self.volumeBtn.removeClass('fa-volume-down');
+			self.changeVolume(0);
+		}else{
+			self.volumeControlSliderDOM.val(100);
+			self.volumeBtn.addClass('fa-volume-up');
+			self.volumeBtn.removeClass('fa-volume-off');
+			self.volumeBtn.removeClass('fa-volume-down');
+			self.changeVolume(100);
+		}
+	});
 	this.volumeControlSliderDOM.on('change', function(value){
 		var volume = event.target.value;
+
+		if(volume > 50){
+			self.volumeBtn.addClass('fa-volume-up');
+			self.volumeBtn.removeClass('fa-volume-off');
+			self.volumeBtn.removeClass('fa-volume-down');
+		}else if(volume < 50 && volume > 0){
+			self.volumeBtn.removeClass('fa-volume-up');
+			self.volumeBtn.removeClass('fa-volume-off');
+			self.volumeBtn.addClass('fa-volume-down');
+		}else{
+			self.volumeBtn.removeClass('fa-volume-up');
+			self.volumeBtn.addClass('fa-volume-off');
+			self.volumeBtn.removeClass('fa-volume-down');
+		}
 		self.changeVolume(volume);
 	});
 }
@@ -362,6 +393,8 @@ function Melon(appKey) {
 	};
 	this.API_URL = 'http://apis.skplanetx.com/melon';
 
+	this.rtChart = null;
+	
 	this._performRequest = function(url, method, data, cb) {
 		// var stringify = querystring.stringify(data);
 		// if (stringify.length > 0)
@@ -376,7 +409,8 @@ function Melon(appKey) {
 				'Accept-Language' : this.options.lang,
 				'appKey' : this.appKey
 			},
-			success: cb
+			success: cb,
+			error: function(error){console.log(error);}
 		});
 	};
 
@@ -386,8 +420,8 @@ function Melon(appKey) {
 			page : page,
 			version : this.options.apiVersion,
 			searchKeyword : searchTerm
-		}, function(error, response, data) {
-			me._resultHandler(error, response, data, cb);
+		}, function(response, data) {
+			me._resultHandler(response, data, cb);
 		});
 	};
 	
@@ -396,17 +430,19 @@ function Melon(appKey) {
 			count : count,
 			page : page,
 			version : this.options.apiVersion
-		}, function(error, response, data) {
-			me._resultHandler(error, response, data, cb);
+		}, function(response, data) {
+			me._resultHandler(response, data, cb);
 		});
 	};
 	
-	this._resultHandler = function(error, response, data, cb) {
-		if (!error) {
-			var data = JSON.parse(data);
-			cb(true, data.melon)
-		} else
-			cb(false, null)
+	this._resultHandler = function(response, data, cb) {
+		cb(response.melon.songs.song);
+		// console.log(error, response, data, cb)
+		// if (!error) {
+		// 	var data = JSON.parse(data);
+		// 	cb(true, data.melon)
+		// } else
+		// 	cb(false, null)
 	};
 }
 
