@@ -29,7 +29,11 @@ function View() {
 	this.store = new listStorage(this);
 	this.videoPlayer = new videoPlayer(this);
 	
+	// this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
 
+	// this.melon.TopDailySongs(50, 1, function(json){
+		// console.log(json);
+	// })
 	$(document).click(function(evt){
         self.contextMenuClear();
 	});

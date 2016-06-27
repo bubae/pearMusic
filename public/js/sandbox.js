@@ -15,21 +15,33 @@ var CONSTANTS = {
   REPORT_TO_GA: "REPORT_TO_GA",
 };
 
+var current_width = 300;
+var current_height = 200;
+
 var messageHandler = function(rawMsg) {
   // console.log(rawMsg)
   var msg = rawMsg.data;
   switch (msg.type) {
     case CONSTANTS.LOAD_VIDEO:
-      player.loadVideoById(msg.videoId, 0, 'small');
+      if (current_height > 400){
+        player.loadVideoById(msg.videoId, 0, 'large');
+      }else{
+        player.loadVideoById(msg.videoId, 0, 'small');
+      }
       break;
     case CONSTANTS.CUE_VIDEO:
-      console.log("cuEE", rawMsg);
-      player.cueVideoById(msg.videoId, 0, 'small');
+      if (current_height > 400){
+        player.cueVideoById(msg.videoId, 0, 'large');
+      }else{
+        player.cueVideoById(msg.videoId, 0, 'small');
+      }
       break;
     case CONSTANTS.SET_VOLUME:
       player.setVolume(msg.volume);
       break;
     case CONSTANTS.SET_VIDEO_SIZE:
+      current_width = msg.width;
+      current_height = msg.height;
       player.setSize(msg.width, msg.height);
       break;
     case CONSTANTS.TOGGLE_PLAY_PAUSE:
