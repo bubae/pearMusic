@@ -110,7 +110,7 @@ function videoPlayer(view) {
 	this.currentIndex = 0;
 	this.nextVideoId = null;
 	this.numList = 0;
-	this.playCue = null;
+	this.playCue = [];
 	this.volume = 100;
 	this.playState = 0;
 	this.winSize = null;
@@ -202,8 +202,14 @@ videoPlayer.prototype.setPlayList = function(playList){
 }
 
 videoPlayer.prototype.listCueSetUp = function(){
-	this.playCue = Object.keys(this.currentPlayList.videoContainer).reverse();
-	this.numList = this.playCue.length;
+	var keyList = Object.keys(this.currentPlayList.videoContainer).reverse();
+	var tmpPlayCue = [];
+	this.playCue = [];
+	this.numList = keyList.length;
+
+	for(i=0;i<this.numList;i++){
+		this.playCue.push(this.currentPlayList.videoContainer[keyList[i]])
+	}
 
 	// this.cueVideo(this.playCue[this.currentIndex]);
 }
@@ -233,16 +239,16 @@ videoPlayer.prototype.setWindowSize = function(width, height){
 	});
 }
 
-videoPlayer.prototype.loadVideo = function(videoId){
-	this.currentVideo = videoId;
+videoPlayer.prototype.loadVideo = function(videoInfo){
+	this.currentVideo = videoInfo;
 
-	var video = this.currentPlayList.videoContainer[videoId];
+	// var video = this.currentPlayList.videoContainer[videoId];
 
-	this.videoTitleDOM.innerHTML = video.name;
-	this.videoAristDOM.innerHTML = video.artist;
+	this.videoTitleDOM.innerHTML = videoInfo.name;
+	this.videoAristDOM.innerHTML = videoInfo.artist;
 	this.sandbox.sendMessage({
 		type: _CONSTANTS.LOAD_VIDEO,
-		videoId: videoId
+		videoId: videoInfo.id
 	});
 }
 
@@ -309,35 +315,72 @@ function listStorage(view) {
 	var self = this;
 	this.view = view;
 	this.playlistContainer = {};
-
+	this.playListIDSet = null;
+	this.numLoaded = 0;
 	// chrome.storage.sync.clear();
-	chrome.storage.sync.get('listStorage', function(item){
-		if (Object.keys(item).length == 0){
-			self.playlistContainer["MyList"] = new videoStorage(null, null, self);
-			self.saveStorage();
-		}else{
-			self.playlistContainer = item.listStorage;
-			self.initStorage();
-		}
-		self.view.playListSetUp();
-	});
+	this.loadStorage();
 }
 
-listStorage.prototype.initStorage = function(){
-	var tempContainer = this.playlistContainer;
-	var playlistContainer = {};
-	var listKeys = Object.keys(tempContainer);
-	var numPlayLists = listKeys.length;
+listStorage.prototype.loadStorage = function(){
+	var self = this;
 
-	for (i=0;i<numPlayLists;i++){
-		this.playlistContainer[listKeys[i]] = new videoStorage(listKeys[i], tempContainer[listKeys[i]].videoContainer, this);
-	}
+	chrome.storage.sync.get('_playLists', function(item){
+
+		if (Object.keys(item).length == 0){
+			self.playListIDSet = ["MyList"];
+			self.playlistContainer["MyList"] = new videoStorage(null, null, self);
+			self.saveStorage();
+			self.view.playListSetUp();
+		}else{
+			self.playListIDSet = item._playLists;
+			self.numLoaded = 0;
+			if (self.playListIDSet.length==0){
+				self.playListIDSet = ["MyList"];
+				self.playlistContainer["MyList"] = new videoStorage(null, null, self);
+				self.saveStorage();
+				self.view.playListSetUp();
+			}else{
+				self.numLoaded = 0;
+				for(i=0;i<self.playListIDSet.length;i++){
+					self.initStorage(self.playListIDSet[i]);
+				}				
+			}
+		}
+		// self.view.playListSetUp();
+	});
+
+}
+
+listStorage.prototype.initStorage = function(playListID){
+	var self = this;
+	// var tempContainer = this.playlistContainer;
+	// var playlistContainer = {};
+	// var listKeys = Object.keys(tempContainer);
+	// var numPlayLists = listKeys.length;
+	chrome.storage.sync.get(playListID, function(item){
+		self.playlistContainer[playListID] = new videoStorage(playListID, item[playListID], self);
+		self.numLoaded = self.numLoaded + 1;
+		if( self.numLoaded >= self.playListIDSet.length){
+			self.view.playListSetUp();
+		}
+	});
+
+	// for (i=0;i<numPlayLists;i++){
+	// 	this.playlistContainer[listKeys[i]] = new videoStorage(listKeys[i], tempContainer[listKeys[i]].videoContainer, this);
+	// }
 
 	// this.playlistContainer = playlistContainer;
 }
 
 listStorage.prototype.saveStorage = function(){
-	chrome.storage.sync.set({'listStorage': this.playlistContainer}, this.saveStorageCallback);
+	chrome.storage.sync.set({'_playLists': this.playListIDSet}, this.saveStorageCallback);
+
+	for(i=0;i<this.playListIDSet.length;i++){
+		var key = this.playListIDSet[i];
+		var obj = {};
+		obj[key] = this.playlistContainer[key].videoContainer;
+		chrome.storage.sync.set(obj, this.saveStorageCallback);
+	}
 }
 
 listStorage.prototype.saveStorageCallback = function(){
@@ -345,20 +388,34 @@ listStorage.prototype.saveStorageCallback = function(){
 
 listStorage.prototype.addList = function(playListName){
 	// Name duplicate Check
+	this.playListIDSet.push(playListName);
 	this.playlistContainer[playListName] = new videoStorage(playListName, null, this);
 	this.saveStorage();
 }
 
 listStorage.prototype.removeList = function(playListName){
+	var index = this.playListIDSet.indexOf(playListName);
+	if (index >= 0){
+		this.playListIDSet.splice(index, 1);
+	}
 	delete this.playlistContainer[playListName];
 	this.saveStorage();
 }
 
 listStorage.prototype.changeListName = function(oldName, newName){
+	var index = this.playListIDSet.indexOf(oldName);
+	if (index >= 0){
+		this.playListIDSet[index] = newName;
+	}
 	this.playlistContainer[oldName].changeName(newName);
 	this.playlistContainer[newName] = this.playlistContainer[oldName];
 	delete this.playlistContainer[oldName];
 	this.saveStorage();	
+}
+
+listStorage.prototype.refresh = function(){
+	chrome.storage.sync.clear();
+	this.saveStorage();
 }
 
 function videoStorage(name, videoContainer, listStorage) {
@@ -370,7 +427,6 @@ function videoStorage(name, videoContainer, listStorage) {
 
 videoStorage.prototype.changeName = function(newName){
 	this.name = newName;
-	this.listStorage.saveStorage();
 }
 
 videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
@@ -386,6 +442,7 @@ videoStorage.prototype.removeVideo = function(videoID) {
 
 function Melon(appKey) {
 	var me = this;
+	this.flagCount = 0;
 	this.appKey = appKey;
 	this.options = {
 		lang : 'ko_KR',
@@ -396,22 +453,17 @@ function Melon(appKey) {
 	this.rtChart = null;
 	
 	this._performRequest = function(url, method, data, cb) {
-		// var stringify = querystring.stringify(data);
-		// if (stringify.length > 0)
-		// 	url += '?' + stringify;
-		// console.log('REQUEST TO', API_URL + url);
 
-		$.ajax({
-			type: method,
-			url: me.API_URL + url,
-			data: data,
-			headers : {
-				'Accept-Language' : this.options.lang,
-				'appKey' : this.appKey
-			},
-			success: cb,
-			error: function(error){console.log(error);}
-		});
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', me.API_URL + url, true);
+		xhr.responseType = 'json';
+		xhr.setRequestHeader('Accept-Language', this.options.lang);
+		xhr.setRequestHeader('appKey', this.appKey);
+		xhr.onload = function(e) {
+			cb(this.response, null);
+		};
+		xhr.send();	
+
 	};
 
 	this._search = function(path, searchTerm, count, page, cb) {
@@ -426,7 +478,7 @@ function Melon(appKey) {
 	};
 	
 	this._pagedQuery = function(path, count, page, cb) {
-		this._performRequest(path, 'GET', {
+		this._performRequest(path + "?page=1&count=100&version=1", 'GET', {
 			count : count,
 			page : page,
 			version : this.options.apiVersion
@@ -437,12 +489,6 @@ function Melon(appKey) {
 	
 	this._resultHandler = function(response, data, cb) {
 		cb(response.melon.songs.song);
-		// console.log(error, response, data, cb)
-		// if (!error) {
-		// 	var data = JSON.parse(data);
-		// 	cb(true, data.melon)
-		// } else
-		// 	cb(false, null)
 	};
 }
 
