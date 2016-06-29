@@ -204,6 +204,7 @@ videoPlayer.prototype.setPlayList = function(playList){
 videoPlayer.prototype.listCueSetUp = function(){
 	var keyList = Object.keys(this.currentPlayList.videoContainer).reverse();
 	var tmpPlayCue = [];
+
 	this.playCue = [];
 	this.numList = keyList.length;
 
@@ -211,7 +212,6 @@ videoPlayer.prototype.listCueSetUp = function(){
 		this.playCue.push(this.currentPlayList.videoContainer[keyList[i]])
 	}
 
-	// this.cueVideo(this.playCue[this.currentIndex]);
 }
 
 videoPlayer.prototype.getState = function(){
@@ -365,14 +365,11 @@ listStorage.prototype.initStorage = function(playListID){
 		}
 	});
 
-	// for (i=0;i<numPlayLists;i++){
-	// 	this.playlistContainer[listKeys[i]] = new videoStorage(listKeys[i], tempContainer[listKeys[i]].videoContainer, this);
-	// }
 
-	// this.playlistContainer = playlistContainer;
 }
 
 listStorage.prototype.saveStorage = function(){
+
 	chrome.storage.sync.set({'_playLists': this.playListIDSet}, this.saveStorageCallback);
 
 	for(i=0;i<this.playListIDSet.length;i++){
@@ -459,11 +456,11 @@ function Melon(appKey) {
 		xhr.responseType = 'json';
 		xhr.setRequestHeader('Accept-Language', this.options.lang);
 		xhr.setRequestHeader('appKey', this.appKey);
+
 		xhr.onload = function(e) {
 			cb(this.response, null);
 		};
 		xhr.send();	
-
 	};
 
 	this._search = function(path, searchTerm, count, page, cb) {
@@ -552,6 +549,18 @@ Melon.prototype.Genres = function(cb) {
 	}, function(error, response, data) {
 		me._resultHandler(error, response, data, cb);
 	});
+};
+
+Melon.prototype.getVideoID = function(cb) {
+	var chart = rtChart;
+	for (i=0;i<chart.length;i++){
+		item = chart[i];
+		var artist = "";
+		for (j=0;j<item.artists.artist.length;j++){
+			artist = artist + item.artists.artist[j].artistName + ', ';			
+		}
+		artist = artist.slice(0,-2);
+	}	
 };
 
 function shuffle(a) {

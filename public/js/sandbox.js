@@ -24,14 +24,14 @@ var messageHandler = function(rawMsg) {
   switch (msg.type) {
     case CONSTANTS.LOAD_VIDEO:
       if (current_height > 400){
-        player.loadVideoById(msg.videoId, 0, 'large');
+        player.loadVideoById(msg.videoId, 0, 'highres');
       }else{
         player.loadVideoById(msg.videoId, 0, 'small');
       }
       break;
     case CONSTANTS.CUE_VIDEO:
       if (current_height > 400){
-        player.cueVideoById(msg.videoId, 0, 'large');
+        player.cueVideoById(msg.videoId, 0, 'highres');
       }else{
         player.cueVideoById(msg.videoId, 0, 'small');
       }

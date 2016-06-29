@@ -263,10 +263,10 @@ View.prototype.videoListSetUp = function(playListName){
 
 	var tableInnerHTML = "";
 
-	if (numList==0){
-		playListTableDOM[0].innerHTML = tableInnerHTML;
-		return;
-	}
+	// if (numList==0){
+	// 	playListTableDOM[0].innerHTML = tableInnerHTML;
+	// 	return;
+	// }
 
 	for (i=0;i<numList;i++){
 		item = selectedPlayList[listKeys[i]];
@@ -404,7 +404,9 @@ View.prototype.contextEventSetUp = function(){
 
 	$('#videoListContextMenu .addVideo').on('click', function(){
 		var dataset = self.selectedItem[0].dataset;
+
 		self.currentPlayList.addVideo(dataset.id, dataset.name, dataset.artist);
+
 		// self.videoListSetUp(self.currentPlayList.name);
 	});
 
@@ -426,6 +428,7 @@ View.prototype.chartEventSetUp = function() {
 			self.melon.rtChart = res;
 			self.MelonVideoIDSetUp();
 		});
+
 	});
 }
 
