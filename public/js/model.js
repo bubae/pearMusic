@@ -202,8 +202,14 @@ videoPlayer.prototype.setPlayList = function(playList){
 }
 
 videoPlayer.prototype.listCueSetUp = function(){
-	this.playCue = Object.keys(this.currentPlayList.videoContainer).reverse();
-	this.numList = this.playCue.length;
+	var keyList = Object.keys(this.currentPlayList.videoContainer).reverse();
+	var tmpPlayCue = [];
+	this.numList = keyList.length;
+
+	for(i=0;i<this.numList;i++){
+		tmpPlayCue.push(this.currentPlayList.videoContainer[keyList[i]])
+	}
+	this.playCue = tmpPlayCue
 
 	// this.cueVideo(this.playCue[this.currentIndex]);
 }
@@ -233,16 +239,16 @@ videoPlayer.prototype.setWindowSize = function(width, height){
 	});
 }
 
-videoPlayer.prototype.loadVideo = function(videoId){
-	this.currentVideo = videoId;
+videoPlayer.prototype.loadVideo = function(videoInfo){
+	this.currentVideo = videoInfo;
 
-	var video = this.currentPlayList.videoContainer[videoId];
+	// var video = this.currentPlayList.videoContainer[videoId];
 
-	this.videoTitleDOM.innerHTML = video.name;
-	this.videoAristDOM.innerHTML = video.artist;
+	this.videoTitleDOM.innerHTML = videoInfo.name;
+	this.videoAristDOM.innerHTML = videoInfo.artist;
 	this.sandbox.sendMessage({
 		type: _CONSTANTS.LOAD_VIDEO,
-		videoId: videoId
+		videoId: videoInfo.id
 	});
 }
 
@@ -329,6 +335,7 @@ listStorage.prototype.initStorage = function(){
 	var listKeys = Object.keys(tempContainer);
 	var numPlayLists = listKeys.length;
 
+	console.log(tempContainer);
 	for (i=0;i<numPlayLists;i++){
 		this.playlistContainer[listKeys[i]] = new videoStorage(listKeys[i], tempContainer[listKeys[i]].videoContainer, this);
 	}
@@ -337,6 +344,7 @@ listStorage.prototype.initStorage = function(){
 }
 
 listStorage.prototype.saveStorage = function(){
+	console.log(this.playlistContainer);
 	chrome.storage.sync.set({'listStorage': this.playlistContainer}, this.saveStorageCallback);
 }
 
@@ -386,6 +394,7 @@ videoStorage.prototype.removeVideo = function(videoID) {
 
 function Melon(appKey) {
 	var me = this;
+	this.flagCount = 0;
 	this.appKey = appKey;
 	this.options = {
 		lang : 'ko_KR',
@@ -401,17 +410,31 @@ function Melon(appKey) {
 		// 	url += '?' + stringify;
 		// console.log('REQUEST TO', API_URL + url);
 
-		$.ajax({
-			type: method,
-			url: me.API_URL + url,
-			data: data,
-			headers : {
-				'Accept-Language' : this.options.lang,
-				'appKey' : this.appKey
-			},
-			success: cb,
-			error: function(error){console.log(error);}
-		});
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', me.API_URL + url, true);
+		xhr.responseType = 'json';
+		xhr.setRequestHeader('Accept-Language', this.options.lang);
+		xhr.setRequestHeader('appKey', this.appKey);
+		// xhr.setRequestHeader('Content-length', params.length);
+		xhr.onload = function(e) {
+			console.log(this.response);
+			cb(this.response, null);
+		  // var img = document.getElementById('thumbnailImg');
+		  // img.src = window.URL.createObjectURL(this.response);
+		  // document.body.appendChild(img);
+		};
+		xhr.send();	
+		// $.ajax({
+		// 	type: method,
+		// 	url: me.API_URL + url,
+		// 	data: data,
+		// 	headers : {
+		// 		'Accept-Language' : this.options.lang,
+		// 		'appKey' : this.appKey
+		// 	},
+		// 	success: cb,
+		// 	error: function(error){console.log(error);}
+		// });
 	};
 
 	this._search = function(path, searchTerm, count, page, cb) {
@@ -426,7 +449,7 @@ function Melon(appKey) {
 	};
 	
 	this._pagedQuery = function(path, count, page, cb) {
-		this._performRequest(path, 'GET', {
+		this._performRequest(path + "?page=1&count=100&version=1", 'GET', {
 			count : count,
 			page : page,
 			version : this.options.apiVersion
@@ -506,6 +529,18 @@ Melon.prototype.Genres = function(cb) {
 	}, function(error, response, data) {
 		me._resultHandler(error, response, data, cb);
 	});
+};
+
+Melon.prototype.getVideoID = function(cb) {
+	var chart = rtChart;
+	for (i=0;i<chart.length;i++){
+		item = chart[i];
+		var artist = "";
+		for (j=0;j<item.artists.artist.length;j++){
+			artist = artist + item.artists.artist[j].artistName + ', ';			
+		}
+		artist = artist.slice(0,-2);
+	}	
 };
 
 function shuffle(a) {

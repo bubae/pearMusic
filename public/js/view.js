@@ -34,11 +34,11 @@ function View() {
 	
 	this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
 
-	self.melon.RealTimeCharts(100, 1, function(res){
-		self.melon.rtChart = res;
-		console.log(res);
-		// self.melonListSetUp();
-	});
+	// this.melon.RealTimeCharts(100, 1, function(res){
+	// 	self.melon.flagCount = 0;
+	// 	self.melon.rtChart = res;
+	// 	self.MelonVideoIDSetUp();
+	// });
 
 	$(document).click(function(evt){
         self.contextMenuClear();
@@ -181,7 +181,6 @@ View.prototype.fullVideoView = function(){
 }
 
 View.prototype.videoSearch = function(searchText, callback){
-	console.log(searchText)
 	template_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q={{searchText}}&key={{app_key}}";
 
 	search_url = template_url.replace("{{searchText}}", searchText).replace("{{app_key}}", app_key);
@@ -206,7 +205,6 @@ View.prototype.searchResultShow = function(searchData){
 
 	searchContent[0].innerHTML = '';
 	var videoInfos = searchData.items;
-	console.log(videoInfos[0].snippet.thumbnails.medium.url);
 	allContent = "";
 	for (i = 0; i < videoInfos.length; i++) {
 		title = videoInfos[i].snippet.title;
@@ -256,7 +254,7 @@ View.prototype.playListSetUp = function(){
 };
 
 View.prototype.videoListSetUp = function(playListName){
-	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
 	    + '<th scope="row" class="table-rank">{{index}}</th>'
         + '<td class="table-name">{{videoName}}</td>'
         + '<td class="table-artist">{{artist}}</td>'
@@ -269,10 +267,10 @@ View.prototype.videoListSetUp = function(playListName){
 
 	var tableInnerHTML = "";
 
-	if (numList==0){
-		playListTableDOM[0].innerHTML = tableInnerHTML;
-		return;
-	}
+	// if (numList==0){
+	// 	playListTableDOM[0].innerHTML = tableInnerHTML;
+	// 	return;
+	// }
 
 	for (i=0;i<numList;i++){
 		item = selectedPlayList[listKeys[i]];
@@ -287,7 +285,7 @@ View.prototype.videoListSetUp = function(playListName){
 };
 
 View.prototype.videoListAdd = function(id, title, artist){
-	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
 	    + '<th scope="row" class="table-rank">{{index}}</th>'
         + '<td class="table-name">{{videoName}}</td>'
         + '<td class="table-artist">{{artist}}</td>'
@@ -309,7 +307,7 @@ View.prototype.searchContentEventSetUp = function(){
 		self.searchContent[0].innerHTML = '';
 		self.imgThumbnail.addClass('hidden');
 		self.currentPlayList.addVideo(dataset.id, dataset.title, dataset.artist);
-		self.store.saveStorage();
+		// self.store.saveStorage();
 
 		// self.videoListAdd(dataset.id, dataset.title, dataset.artist)		
 		self.videoListSetUp(self.currentPlayList.name);
@@ -369,7 +367,7 @@ View.prototype.videoListEventSetUp = function(){
 	var self = this;
 
 	$("#playlist-table tbody tr").click(function() {
-		self.videoPlayer.loadVideo($(this)[0].dataset.videoid);
+		self.videoPlayer.loadVideo($(this)[0].dataset);
 	});	
 
 	$("#playlist-table tbody tr").contextmenu(function(evt){
@@ -410,13 +408,14 @@ View.prototype.contextEventSetUp = function(){
 
 	$('#videoListContextMenu .addVideo').on('click', function(){
 		var dataset = self.selectedItem[0].dataset;
-		self.currentPlayList.addVideo(dataset.videoid, dataset.name, dataset.artist);
-		self.videoListSetUp(self.currentPlayList.name);
+		// self.testFunc();
+		// self.currentPlayList.addVideo("aaaaab", "test", "test");
+		// self.videoListSetUp(self.currentPlayList.name);
 	});
 
 	$('#videoListContextMenu .removeVideo').on('click', function(){
 		var dataset = self.selectedItem[0].dataset;
-		self.currentPlayList.removeVideo(dataset.videoid);
+		self.currentPlayList.removeVideo(dataset.id);
 		self.videoListSetUp(self.currentPlayList.name);
 	});
 
@@ -426,25 +425,25 @@ View.prototype.chartEventSetUp = function() {
 	var self = this;
 
 	this.melonChartDOM.on('click', function(){
-		self.melon.RealTimeCharts(100, 1, function(res){
-			self.melon.rtChart = res;
-			self.melonListSetUp();
-		});
+		// self.melon.RealTimeCharts(100, 1, function(res){
+			// console.log(res);
+			// self.melon.flagCount = 0;
+			// self.melon.rtChart = res;
+			// self.MelonVideoIDSetUp();
+		// });
 	});
 }
 
 View.prototype.melonListSetUp = function(){
 	var self = this;
-	var trTemplate = '<tr data-videoID="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
 	    + '<th scope="row" class="table-rank">{{index}}</th>'
         + '<td class="table-name">{{videoName}}</td>'
         + '<td class="table-artist">{{artist}}</td>'
         + '</tr>';
     var playListTableDOM = $('#playlist-table tbody');
 	var chartList = this.melon.rtChart;
-
 	var tableInnerHTML = "";
-	console.log("melon");
 	for (i=0;i<chartList.length;i++){
 		item = chartList[i];
 		var artist = "";
@@ -453,16 +452,43 @@ View.prototype.melonListSetUp = function(){
 		}
 		artist = artist.slice(0,-2);
 
-		self.videoSearch(item.songName + " " + artist, function(searchData){
-			console.log(searchData)
-			tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g, searchData.items[0].id.videoId).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.songName).replace(/{{artist}}/g, artist);
-			if (i==99){
-				playListTableDOM[0].innerHTML = tableInnerHTML;
-				self.videoListEventSetUp();				
-			};
-		});
+		tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g, item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.songName).replace(/{{artist}}/g, artist);
 	}
 
+	playListTableDOM[0].innerHTML = tableInnerHTML;
+
+	this.videoListEventSetUp();
+}
+
+View.prototype.MelonVideoIDSetUp = function(){
+	var self = this;
+	var chart = this.melon.rtChart;
+	for (i=0;i<chart.length;i++){
+		item = chart[i];
+		var artist = "";
+		for (j=0;j<item.artists.artist.length;j++){
+			artist = artist + item.artists.artist[j].artistName + ', ';			
+		}
+		artist = artist.slice(0,-2);
+		var searchText = artist + " " + item.songName;
+		searchText = searchText.replace("?", "").replace("&", "").replace("#", "");
+		this.getMelonVideoID(i, searchText);
+	}	
+}
+
+View.prototype.getMelonVideoID = function(index, searchText){
+	var self = this;
+	this.videoSearch(searchText, function(searchData){
+		self.melon.rtChart[index].id = searchData.items[0].id.videoId;
+		self.melon.flagCount = self.melon.flagCount + 1;
+		if(self.melon.flagCount == 100){
+			self.melonListSetUp();
+		}
+	})
+}
+
+View.prototype.testFunc = function(){
+	this.videoPlayer.currentPlayList.addVideo('abcde', 'bbbbb fff', 'ccccc dddd');
 }
 
 function noSearchResult(){
