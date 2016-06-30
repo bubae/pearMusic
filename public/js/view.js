@@ -24,6 +24,7 @@ function View() {
 	this.addListBtnDOM = $('#addListBtn');
 	this.renameListBtnDOM = $('#renameListBtn');
 	this.melonChartDOM = $('#melon-chart');
+	this.loadingDOM = $('.loading');
 
 	this.selectedItem = null;
 	this.lastDisplayElement = null;
@@ -31,7 +32,6 @@ function View() {
 	this.numPlayEntry = null;
 	this.store = new listStorage(this);
 	this.videoPlayer = new videoPlayer(this);
-	
 	this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
 
 	$(document).click(function(evt){
@@ -422,6 +422,8 @@ View.prototype.chartEventSetUp = function() {
 	var self = this;
 
 	this.melonChartDOM.on('click', function(){
+		self.loadingDOM.removeClass("hidden");
+		$('#playlist-table tbody')[0].innerHTML = "";
 		self.melon.RealTimeCharts(100, 1, function(res){
 			self.store.refresh();
 			self.melon.flagCount = 0;
@@ -455,6 +457,7 @@ View.prototype.melonListSetUp = function(){
 
 	playListTableDOM[0].innerHTML = tableInnerHTML;
 
+	this.loadingDOM.addClass("hidden");
 	this.videoListEventSetUp();
 }
 

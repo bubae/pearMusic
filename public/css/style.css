@@ -235,6 +235,14 @@ body{
   padding-bottom: 40px;
 }
 
+#main-content .loading {
+  width: 80px;
+  position: absolute;
+  height: 80px;
+  top: calc(50% - 40px);
+  left: calc(50% - 70px);  
+}
+
 #playlist-table {
 
 }
