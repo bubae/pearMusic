@@ -484,6 +484,12 @@ input.volume-control-slider {
   color: white;  
 }
 
+#video-size-btn .fa{
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 14px; 
+}
+
 #video-size-btn.video-big{
   width: 100%;
   margin-top: 0;
@@ -495,11 +501,11 @@ input.volume-control-slider {
   bottom: 0;  
 }
 
-#video-size-btn .video-size-icon{
+/*#video-size-btn .video-size-icon{
   cursor: pointer;
   margin-right: 10px;
   font-size: 14px;  
-}
+}*/
 
 .contextMenu {
 

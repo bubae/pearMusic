@@ -1,4 +1,8 @@
-var app_key = "AIzaSyBjSx3cD_ArNqKRGFGlVzBQl-N7h16EU8Q";
+var app_keys = ["AIzaSyBjSx3cD_ArNqKRGFGlVzBQl-N7h16EU8Q", "AIzaSyBUAKM6epIO_0DV9rWjyt9kTrJvmThI6ws", 
+				"AIzaSyC6GQKuqmKjNk7HIJlBiVpmwI5nLZyqdI0", "AIzaSyAUQq3alwESMEJTZnu9myTfFQgxRzvoUF0",
+				"AIzaSyDwgSNoxqbjeExpdf4S9z1dtTl7IA7GKEA", "AIzaSyADF2_6Hs-uwnOedVTfIOzqEXbLPugynYM",
+				"AIzaSyCGreXczp30WwPV-NO8Dz94_LCH6-gtfts", "AIzaSyBuQSKIiKDz2Jg6Tev2Tb8zk4iEklgHzf4",
+				"AIzaSyCHFCHMvJKxYudGyoP4kbQiTWTP50rrGo8", "AIzaSyBLQLesUsDmE53AoR7zv9Eemjlop8T9phE"];
 
 function View() {
 	var self = this;
@@ -170,6 +174,8 @@ View.prototype.fullVideoView = function(){
 }
 
 View.prototype.videoSearch = function(searchText, callback){
+	var app_key = app_keys[Math.floor(Math.random()*app_keys.length)];
+	console.log(app_key)
 	template_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q={{searchText}}&key={{app_key}}";
 
 	search_url = template_url.replace("{{searchText}}", searchText).replace("{{app_key}}", app_key);
@@ -397,6 +403,9 @@ View.prototype.contextEventSetUp = function(){
 
 	$('#playListContextMenu .listDelete').on('click', function(){
 		var listName = self.selectedItem[0].dataset.name;
+
+		// var msg = "{{listName}} playlist will be deleted".replace("{{listName}}", listName);
+		// Yes click
 		self.store.removeList(listName);
 		self.currentPlayList = null;
 		self.playListSetUp();

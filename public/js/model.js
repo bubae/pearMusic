@@ -98,8 +98,8 @@ function videoPlayer(view) {
 	this.videoAristDOM = $('.song-artist')[0];
 	this.videoPlayBtnDOM = $('.player-controls .fa-play');
 	this.videoPauseBtnDOM = $('.player-controls .fa-pause');
-	this.videopPreviousBtnDOM = $('.player-controls .fa-step-backward');
-	this.videoNextBtnDOM = $('.player-controls .fa-step-forward');
+	this.videopPreviousBtnDOM = $('.fa-step-backward');
+	this.videoNextBtnDOM = $('.fa-step-forward');
 	this.randomToggleBtnDOM = $('.toggle-shuffle-btn');
 	this.repeatToggleBtnDOM = $('.toggle-repeat-btn');
 	this.volumeControlSliderDOM = $('.volume-control-slider');

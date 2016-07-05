@@ -103,7 +103,7 @@ var loadYouTubeAsync = function() {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  loadYouTubeAsync();
+  // loadYouTubeAsync();
   registerYouTubeEvents();
   window.addEventListener("message", messageHandler, false);
 });

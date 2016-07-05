@@ -25,7 +25,7 @@
     "partitions": [
       {
         "name": "static",
-        "accessible_resources": ["sandbox.html", "public/css/sandbox.css", "public/js/sandbox.js", "library/jquery-2.2.4.min.js"]
+        "accessible_resources": ["sandbox.html", "public/css/sandbox.css", "public/js/sandbox.js", "library/jquery-2.2.4.min.js", "library/iframe_api.js", "library/www-widgetapi.js"]
       }
     ]
   }
