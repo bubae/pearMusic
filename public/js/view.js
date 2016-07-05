@@ -100,6 +100,7 @@ function View() {
 	this.viewSizeBtnEventSetUp();
 	this.videoListEventSetUp();
 	this.contextEventSetUp();
+	this.getChartList();
 	this.chartEventSetUp();
 }
 
@@ -175,7 +176,6 @@ View.prototype.fullVideoView = function(){
 
 View.prototype.videoSearch = function(searchText, callback){
 	var app_key = app_keys[Math.floor(Math.random()*app_keys.length)];
-	console.log(app_key)
 	template_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q={{searchText}}&key={{app_key}}";
 
 	search_url = template_url.replace("{{searchText}}", searchText).replace("{{app_key}}", app_key);
@@ -427,19 +427,24 @@ View.prototype.contextEventSetUp = function(){
 
 }
 
+View.prototype.getChartList = function(){
+	var self = this;
+	self.melon.RealTimeCharts(100, 1, function(res){
+		self.store.refresh();
+		self.melon.flagCount = 0;
+		self.melon.rtChart = res;
+		self.MelonVideoIDSetUp();
+	});
+	setTimeout(self.getChartList, 900000);
+}
+
 View.prototype.chartEventSetUp = function() {
 	var self = this;
 
 	this.melonChartDOM.on('click', function(){
 		self.loadingDOM.removeClass("hidden");
 		$('#playlist-table tbody')[0].innerHTML = "";
-		self.melon.RealTimeCharts(100, 1, function(res){
-			self.store.refresh();
-			self.melon.flagCount = 0;
-			self.melon.rtChart = res;
-			self.MelonVideoIDSetUp();
-		});
-
+		self.melonListSetUp();
 	});
 }
 
@@ -492,7 +497,7 @@ View.prototype.getMelonVideoID = function(index, searchText){
 		self.melon.rtChart[index].id = searchData.items[0].id.videoId;
 		self.melon.flagCount = self.melon.flagCount + 1;
 		if(self.melon.flagCount == 100){
-			self.melonListSetUp();
+			// self.melonListSetUp();
 		}
 	})
 }
