@@ -11,7 +11,7 @@ function View() {
 	this.searchResult = $('#searchResult');
 	this.searchContent = $('#searchContent');
 	this.playListContent = $('#playlist-content');
-	this.pageWapper = $('#page-wrapper');
+	this.pageWapper = $('#main-content');
 	this.videoWapper = $('#video-wrapper');
 	this.videoPlayerDOM = $('#video-player');
 	this.videoSizeBtn = $('#video-size-btn');
@@ -435,7 +435,7 @@ View.prototype.getChartList = function(){
 		self.melon.rtChart = res;
 		self.MelonVideoIDSetUp();
 	});
-	setTimeout(self.getChartList, 900000);
+	setTimeout(self.getChartList, 1800000);
 }
 
 View.prototype.chartEventSetUp = function() {

@@ -111,6 +111,7 @@ function videoPlayer(view) {
 	this.nextVideoId = null;
 	this.numList = 0;
 	this.playCue = [];
+	this.RndPlayCue = [];
 	this.volume = 100;
 	this.playState = 0;
 	this.winSize = null;
@@ -144,8 +145,10 @@ videoPlayer.prototype.controlEventSetUp = function(){
 		self.playMode = (self.playMode+1) % 2;
 
 		if(self.playMode){
+			self.currentIndex = self.RndPlayCue.indexOf(self.currentVideo);
 			$(this).addClass("toggled");
 		}else{
+			self.currentIndex = self.playCue.indexOf(self.currentVideo);
 			$(this).removeClass("toggled");
 		}
 	});
@@ -176,7 +179,7 @@ videoPlayer.prototype.controlEventSetUp = function(){
 			self.changeVolume(100);
 		}
 	});
-	this.volumeControlSliderDOM.on('change', function(value){
+	this.volumeControlSliderDOM.on('input change', function(value){
 		var volume = event.target.value;
 
 		if(volume > 50){
@@ -211,6 +214,8 @@ videoPlayer.prototype.listCueSetUp = function(){
 	for(i=0;i<this.numList;i++){
 		this.playCue.push(this.currentPlayList.videoContainer[keyList[i]])
 	}
+
+	this.RndPlayCue = shuffle(this.playCue);
 
 }
 
@@ -283,11 +288,12 @@ videoPlayer.prototype.playPrevSong = function(){
 	if(this.playRepeat){
 		this.loadVideo(this.currentVideo);
 	}else{
+		this.currentIndex = (this.currentIndex - 1 + this.numList) % this.numList;
 		if(this.playMode){
-			this.currentIndex = (this.currentIndex + 1 + Math.floor(Math.random()*(this.numList-1))) % this.numList;
-			this.loadVideo(this.playCue[this.currentIndex]);
+			// this.currentIndex = (this.currentIndex + 1 + Math.floor(Math.random()*(this.numList-1))) % this.numList;
+			this.loadVideo(this.RndPlayCue[this.currentIndex]);
 		}else{
-			this.currentIndex = (this.currentIndex - 1 + this.numList) % this.numList;
+			// this.currentIndex = (this.currentIndex - 1 + this.numList) % this.numList;
 			this.loadVideo(this.playCue[this.currentIndex]);
 		}		
 	}
@@ -297,11 +303,12 @@ videoPlayer.prototype.playNextSong = function(){
 	if(this.playRepeat){
 		this.loadVideo(this.currentVideo);
 	}else{
+		this.currentIndex = (this.currentIndex + 1) % this.numList;
 		if(this.playMode){
-			this.currentIndex = (this.currentIndex + 1 + Math.floor(Math.random()*(this.numList-1))) % this.numList;
-			this.loadVideo(this.playCue[this.currentIndex]);
+			// this.currentIndex = (this.currentIndex + 1 + Math.floor(Math.random()*(this.numList-1))) % this.numList;
+			this.loadVideo(this.RndPlayCue[this.currentIndex]);
 		}else{
-			this.currentIndex = (this.currentIndex + 1) % this.numList;
+			// this.currentIndex = (this.currentIndex + 1) % this.numList;
 			this.loadVideo(this.playCue[this.currentIndex]);
 		}		
 	}
@@ -346,17 +353,13 @@ listStorage.prototype.loadStorage = function(){
 				}				
 			}
 		}
-		// self.view.playListSetUp();
 	});
 
 }
 
 listStorage.prototype.initStorage = function(playListID){
 	var self = this;
-	// var tempContainer = this.playlistContainer;
-	// var playlistContainer = {};
-	// var listKeys = Object.keys(tempContainer);
-	// var numPlayLists = listKeys.length;
+
 	chrome.storage.sync.get(playListID, function(item){
 		self.playlistContainer[playListID] = new videoStorage(playListID, item[playListID], self);
 		self.numLoaded = self.numLoaded + 1;
@@ -428,6 +431,7 @@ videoStorage.prototype.changeName = function(newName){
 
 videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
 	this.videoContainer[videoID] = {"id": videoID, "name": videoName, "artist": videoArtist};
+	console.log(this.videoContainer);
 	this.listStorage.saveStorage();
 }
 
@@ -563,12 +567,23 @@ Melon.prototype.getVideoID = function(cb) {
 	}	
 };
 
-function shuffle(a) {
-    var j, x, i;
-    for (i = a.length; i; i -= 1) {
-        j = Math.floor(Math.random() * i);
-        x = a[i - 1];
-        a[i - 1] = a[j];
-        a[j] = x;
+function shuffle(temp) {
+	var array = temp.slice(0);
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        // And swap the last element with it
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
     }
+
+    return array;
 }
