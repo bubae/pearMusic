@@ -14,3 +14,4 @@
 //         $("#searchBox")[0].value = ""
 //     }
 // });
+$( "#playlist-body" ).sortable();

@@ -17,9 +17,19 @@
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" type="text/css" href="library/bootstrap-3.3.6/css/bootstrap.min.css" />
 
+    <!-- JQUERY UI CSS -->
+    <link rel="stylesheet" type="text/css" href="library/jquery-ui.min.css" />    
+
     <!--Fonts-->
     <link rel='stylesheet' type='text/css' href='public/css/font.css' >
     <link rel="stylesheet" type='text/css' href="library/font-awesome-4.6.3/css/font-awesome.min.css">
+
+    <style>
+      #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+      #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+      #sortable li span { position: absolute; margin-left: -1.3em; }
+    </style>
+
 </head>
 
   <body>
@@ -63,17 +73,24 @@
         </div>
         <div id="main-content">
           <img class="loading hidden" src="assets/loading_icon.gif" style="width: 100px;height:100px">
-          <table id="playlist-table" class="table table-condensed"> 
-            <thead class="table-head"> 
-              <tr> 
-                <th class="table-rank">RANK</th> 
-                <th class="table-name">SONG NAME</th> 
-                <th class="table-artist">ARTIST</th> 
-              </tr> 
-            </thead> 
-            <tbody class="table-body">
-            </tbody> 
-          </table>
+          <ul id="playlist-head">
+            <li>
+              <div class="list-row">
+                <div class="row-index">
+                  RANK
+                </div>
+                <div class="row-song">
+                  SONG NAME
+                </div>
+                <div class="row-artist">
+                  ARTIST
+                </div>
+              </div>
+            </li>
+          </ul>
+          <ul id="playlist-body">
+          </ul>
+
         </div>
       </div>
 
@@ -168,12 +185,11 @@
       </table>
     </div>
 
-
-
     <!-- /#wrapper -->
 
     <!-- jQuery -->
     <script type="text/javascript" src="library/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="library/jquery-ui.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script type="text/javascript" src="library/bootstrap.min.js"></script>

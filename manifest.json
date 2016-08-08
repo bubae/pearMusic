@@ -3,7 +3,7 @@
   "description": "Music player in youtube",
   "manifest_version": 2,
   "minimum_chrome_version": "23",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "offline_enabled": false,
   "app": {
     "background": {
@@ -25,7 +25,7 @@
     "partitions": [
       {
         "name": "static",
-        "accessible_resources": ["sandbox.html", "public/css/sandbox.css", "public/js/sandbox.js", "library/jquery-2.2.4.min.js", "library/iframe_api.js", "library/www-widgetapi.js"]
+        "accessible_resources": ["sandbox.html", "public/css/sandbox.css", "public/js/sandbox.js", "library/jquery-ui.min.js", "library/jquery-2.2.4.min.js", "library/iframe_api.js", "library/www-widgetapi.js"]
       }
     ]
   }

@@ -37,6 +37,7 @@ function View() {
 	this.store = new listStorage(this);
 	this.videoPlayer = new videoPlayer(this);
 	this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
+	this.chartResetFlag = false;
 
 	$(document).click(function(evt){
         self.contextMenuClear();
@@ -100,7 +101,7 @@ function View() {
 	this.viewSizeBtnEventSetUp();
 	this.videoListEventSetUp();
 	this.contextEventSetUp();
-	this.getChartList();
+	// this.getChartList();
 	this.chartEventSetUp();
 }
 
@@ -256,18 +257,25 @@ View.prototype.playListSetUp = function(){
 };
 
 View.prototype.videoListSetUp = function(playListName){
-	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
-	    + '<th scope="row" class="table-rank">{{index}}</th>'
-        + '<td class="table-name">{{videoName}}</td>'
-        + '<td class="table-artist">{{artist}}</td>'
-        + '</tr>';
-    var playListTableDOM = $('#playlist-table tbody');
+	// var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	//     + '<th scope="row" class="table-rank">{{index}}</th>'
+ //        + '<td class="table-name">{{videoName}}</td>'
+ //        + '<td class="table-artist">{{artist}}</td>'
+ //        + '</tr>';
+    var liTemplate = '<li data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+    + '<div class="list-row">'
+    + '<div class="row-index">{{index}}</div>'
+    + '<div class="row-song">{{videoName}}</div>'
+    + '<div class="row-artist">{{artist}}</div>'
+    + '</div></li>';
+    // var playListTableDOM = $('#playlist-table tbody');
+    var playListBodyDOM = $('#playlist-body');
 	var playLists = this.store.playlistContainer;
 	var selectedPlayList = playLists[playListName].videoContainer;
 	var listKeys = Object.keys(selectedPlayList).reverse();
 	var numList = listKeys.length;
 
-	var tableInnerHTML = "";
+	var bodyInnerHTML = "";
 
 	// if (numList==0){
 	// 	playListTableDOM[0].innerHTML = tableInnerHTML;
@@ -276,26 +284,33 @@ View.prototype.videoListSetUp = function(playListName){
 
 	for (i=0;i<numList;i++){
 		item = selectedPlayList[listKeys[i]];
-		tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g,item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.name).replace(/{{artist}}/g, item.artist);
+		bodyInnerHTML = bodyInnerHTML + liTemplate.replace(/{{videoID}}/g,item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.name).replace(/{{artist}}/g, item.artist);
 	}
 
 	this.numPlayEntry = numList;
-	playListTableDOM[0].innerHTML = tableInnerHTML;
+	playListBodyDOM[0].innerHTML = bodyInnerHTML;
 
 	this.videoPlayer.setPlayList(playLists[playListName]);
 	this.videoListEventSetUp();
 };
 
 View.prototype.videoListAdd = function(id, title, artist){
-	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
-	    + '<th scope="row" class="table-rank">{{index}}</th>'
-        + '<td class="table-name">{{videoName}}</td>'
-        + '<td class="table-artist">{{artist}}</td>'
-        + '</tr>';
+	// var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	//     + '<th scope="row" class="table-rank">{{index}}</th>'
+ //        + '<td class="table-name">{{videoName}}</td>'
+ //        + '<td class="table-artist">{{artist}}</td>'
+ //        + '</tr>';
+    var liTemplate = '<li data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+    + '<div class="list-row">'
+    + '<div class="row-index">{{index}}</div>'
+    + '<div class="row-song">{{videoName}}</div>'
+    + '<div class="row-artist">{{artist}}</div>'
+    + '</div></li>';
 
-    var playListTableDOM = $('#playlist-table tbody');
+    var playListBodyDOM = $('#playlist-body');
+    // var playListTableDOM = $('#playlist-table tbody');
 
-	playListTableDOM[0].innerHTML = playListTableDOM[0].innerHTML + trTemplate.replace(/{{videoID}}/g,id).replace(/{{index}}/g, this.numPlayEntry+1).replace(/{{videoName}}/g, title).replace(/{{artist}}/g, artist);
+	playListBodyDOM[0].innerHTML = playListBodyDOM[0].innerHTML + liTemplate.replace(/{{videoID}}/g,id).replace(/{{index}}/g, this.numPlayEntry+1).replace(/{{videoName}}/g, title).replace(/{{artist}}/g, artist);
 	this.numPlayEntry = this.numPlayEntry + 1;
 	this.videoListEventSetUp();
 }
@@ -317,7 +332,7 @@ View.prototype.searchContentEventSetUp = function(){
 
 	$("#searchContent li").hover(function() {
 		var top = $(this).offset().top;
-		var left = $(this).offset().left + 285;
+		var left = $(this).offset().left + $(this).width() + 20;
 
 		self.imgThumbnail.css('position', 'absolute');
 		self.imgThumbnail.css('top', top);
@@ -365,14 +380,29 @@ View.prototype.playListEventSetUp = function(){
 	});
 }
 
+View.prototype.activePlayingDOM = function(videoId){
+	var self = this;
+	var liList = $("#playlist-body li");
+	if(typeof(liList)=="object"){
+		liList.removeClass("playing");
+		var length = liList.length;
+		for(i=0;i<length;i++){
+			if(liList[i].dataset.id == videoId){
+				$(liList[i]).addClass("playing");
+				break;
+			}
+		}
+	}
+}
+
 View.prototype.videoListEventSetUp = function(){
 	var self = this;
 
-	$("#playlist-table tbody tr").click(function() {
+	$("#playlist-body li").click(function() {
 		self.videoPlayer.loadVideo($(this)[0].dataset);
 	});	
 
-	$("#playlist-table tbody tr").contextmenu(function(evt){
+	$("#playlist-body li").contextmenu(function(evt){
 		self.contextMenuClear();
 		self.selectedItem = $(this);
         var posx = evt.clientX +window.pageXOffset +'px'; //Left Position of Mouse Pointer
@@ -429,35 +459,49 @@ View.prototype.contextEventSetUp = function(){
 
 View.prototype.getChartList = function(){
 	var self = this;
-	self.melon.RealTimeCharts(100, 1, function(res){
-		self.store.refresh();
-		self.melon.flagCount = 0;
-		self.melon.rtChart = res;
-		self.MelonVideoIDSetUp();
-	});
-	setTimeout(self.getChartList, 1800000);
+	self.loadingDOM.removeClass("hidden");
+	$('#playlist-body')[0].innerHTML = "";
+	if(this.chartResetFlag){
+		self.melonListSetUp();		
+	}else{
+		self.chartResetFlag = true;
+		self.melon.RealTimeCharts(100, 1, function(res){
+			self.store.refresh();
+			self.melon.flagCount = 0;
+			self.melon.rtChart = res;
+			self.MelonVideoIDSetUp();
+		});
+		setTimeout(function(){
+			self.chartResetFlag = false;
+		}, 3600000);
+	}
 }
 
 View.prototype.chartEventSetUp = function() {
 	var self = this;
 
 	this.melonChartDOM.on('click', function(){
-		self.loadingDOM.removeClass("hidden");
-		$('#playlist-table tbody')[0].innerHTML = "";
-		self.melonListSetUp();
+		self.getChartList();
 	});
 }
 
 View.prototype.melonListSetUp = function(){
 	var self = this;
-	var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
-	    + '<th scope="row" class="table-rank">{{index}}</th>'
-        + '<td class="table-name">{{videoName}}</td>'
-        + '<td class="table-artist">{{artist}}</td>'
-        + '</tr>';
-    var playListTableDOM = $('#playlist-table tbody');
+	// var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+	//     + '<th scope="row" class="table-rank">{{index}}</th>'
+ //        + '<td class="table-name">{{videoName}}</td>'
+ //        + '<td class="table-artist">{{artist}}</td>'
+ //        + '</tr>';
+    var liTemplate = '<li data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+    + '<div class="list-row">'
+    + '<div class="row-index">{{index}}</div>'
+    + '<div class="row-song">{{videoName}}</div>'
+    + '<div class="row-artist">{{artist}}</div>'
+    + '</div></li>';
+
+    var playListBodyDOM = $('#playlist-body');
 	var chartList = this.melon.rtChart;
-	var tableInnerHTML = "";
+	var bodyInnerHTML = "";
 	for (i=0;i<chartList.length;i++){
 		item = chartList[i];
 		var artist = "";
@@ -466,10 +510,10 @@ View.prototype.melonListSetUp = function(){
 		}
 		artist = artist.slice(0,-2);
 
-		tableInnerHTML = tableInnerHTML + trTemplate.replace(/{{videoID}}/g, item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.songName).replace(/{{artist}}/g, artist);
+		bodyInnerHTML = bodyInnerHTML + liTemplate.replace(/{{videoID}}/g, item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.songName).replace(/{{artist}}/g, artist);
 	}
 
-	playListTableDOM[0].innerHTML = tableInnerHTML;
+	playListBodyDOM[0].innerHTML = bodyInnerHTML;
 
 	this.loadingDOM.addClass("hidden");
 	this.videoListEventSetUp();
@@ -497,7 +541,7 @@ View.prototype.getMelonVideoID = function(index, searchText){
 		self.melon.rtChart[index].id = searchData.items[0].id.videoId;
 		self.melon.flagCount = self.melon.flagCount + 1;
 		if(self.melon.flagCount == 100){
-			// self.melonListSetUp();
+			self.melonListSetUp();
 		}
 	})
 }

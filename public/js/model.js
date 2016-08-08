@@ -246,6 +246,13 @@ videoPlayer.prototype.setWindowSize = function(width, height){
 
 videoPlayer.prototype.loadVideo = function(videoInfo){
 	this.currentVideo = videoInfo;
+	console.log(this.playMode);
+	if(this.playMode){
+		this.currentIndex = this.RndPlayCue.map(function(e){return e.id;}).indexOf(videoInfo.id);
+	}else{
+		this.currentIndex = this.playCue.map(function(e){return e.id;}).indexOf(videoInfo.id);
+	}
+	console.log(this.playMode, this.currentIndex, videoInfo);
 
 	// var video = this.currentPlayList.videoContainer[videoId];
 
@@ -255,6 +262,7 @@ videoPlayer.prototype.loadVideo = function(videoInfo){
 		type: _CONSTANTS.LOAD_VIDEO,
 		videoId: videoInfo.id
 	});
+	this.view.activePlayingDOM(videoInfo.id);
 }
 
 videoPlayer.prototype.cueVideo = function(videoId){
@@ -431,7 +439,6 @@ videoStorage.prototype.changeName = function(newName){
 
 videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
 	this.videoContainer[videoID] = {"id": videoID, "name": videoName, "artist": videoArtist};
-	console.log(this.videoContainer);
 	this.listStorage.saveStorage();
 }
 
