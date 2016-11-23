@@ -16,7 +16,7 @@ function View() {
 	this.videoPlayerDOM = $('#video-player');
 	this.videoSizeBtn = $('#video-size-btn');
 	this.videoControllerDOM = $('#video-controller');
-
+	this.playListBodyDOM = $('#playlist-body');
 	this.playListContextMenuDOM = $('#playListContextMenu');
 	this.videoListContextMenuDOM = $('#videoListContextMenu');
 
@@ -38,6 +38,7 @@ function View() {
 	this.videoPlayer = new videoPlayer(this);
 	this.melon = new Melon('8821b706-32bb-3892-8bc6-7b4540b08581');
 	this.chartResetFlag = false;
+	this.viewChart = false;
 
 	$(document).click(function(evt){
         self.contextMenuClear();
@@ -254,26 +255,22 @@ View.prototype.playListSetUp = function(){
 
 	this.playListEventSetUp();
 	this.videoListSetUp(this.currentPlayList.name);
+	this.currentPlayList.listIndexUpdate();
 };
 
 View.prototype.videoListSetUp = function(playListName){
-	// var trTemplate = '<tr data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
-	//     + '<th scope="row" class="table-rank">{{index}}</th>'
- //        + '<td class="table-name">{{videoName}}</td>'
- //        + '<td class="table-artist">{{artist}}</td>'
- //        + '</tr>';
-    var liTemplate = '<li data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}">'
+    var liTemplate = '<li data-id="{{videoID}}" data-name="{{videoName}}" data-artist="{{artist}}" data-index="{{_index}}">'
     + '<div class="list-row">'
     + '<div class="row-index">{{index}}</div>'
     + '<div class="row-song">{{videoName}}</div>'
     + '<div class="row-artist">{{artist}}</div>'
     + '</div></li>';
     // var playListTableDOM = $('#playlist-table tbody');
-    var playListBodyDOM = $('#playlist-body');
+    var playListBodyDOM = this.playListBodyDOM;
 	var playLists = this.store.playlistContainer;
 	var selectedPlayList = playLists[playListName].videoContainer;
-	var listKeys = Object.keys(selectedPlayList).reverse();
-	var numList = listKeys.length;
+	// var listKeys = Object.keys(selectedPlayList).reverse();
+	var numList = selectedPlayList.length;
 
 	var bodyInnerHTML = "";
 
@@ -283,13 +280,14 @@ View.prototype.videoListSetUp = function(playListName){
 	// }
 
 	for (i=0;i<numList;i++){
-		item = selectedPlayList[listKeys[i]];
-		bodyInnerHTML = bodyInnerHTML + liTemplate.replace(/{{videoID}}/g,item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.name).replace(/{{artist}}/g, item.artist);
+		item = selectedPlayList[i];
+		bodyInnerHTML = bodyInnerHTML + liTemplate.replace(/{{videoID}}/g,item.id).replace(/{{index}}/g, i+1).replace(/{{videoName}}/g, item.name).replace(/{{artist}}/g, item.artist).replace(/{{_index}}/g, i);
 	}
 
 	this.numPlayEntry = numList;
 	playListBodyDOM[0].innerHTML = bodyInnerHTML;
 
+	this.viewChart = false;
 	this.videoPlayer.setPlayList(playLists[playListName]);
 	this.videoListEventSetUp();
 };
@@ -307,7 +305,7 @@ View.prototype.videoListAdd = function(id, title, artist){
     + '<div class="row-artist">{{artist}}</div>'
     + '</div></li>';
 
-    var playListBodyDOM = $('#playlist-body');
+    var playListBodyDOM = this.playListBodyDOM;
     // var playListTableDOM = $('#playlist-table tbody');
 
 	playListBodyDOM[0].innerHTML = playListBodyDOM[0].innerHTML + liTemplate.replace(/{{videoID}}/g,id).replace(/{{index}}/g, this.numPlayEntry+1).replace(/{{videoName}}/g, title).replace(/{{artist}}/g, artist);
@@ -323,10 +321,10 @@ View.prototype.searchContentEventSetUp = function(){
 		dataset = $(this)[0].dataset;
 		self.searchContent[0].innerHTML = '';
 		self.imgThumbnail.addClass('hidden');
-		self.currentPlayList.addVideo(dataset.id, dataset.title, dataset.artist);
 		// self.store.saveStorage();
 
 		// self.videoListAdd(dataset.id, dataset.title, dataset.artist)		
+		self.currentPlayList.addVideo(dataset.id, dataset.title, dataset.artist);
 		self.videoListSetUp(self.currentPlayList.name);
 	});
 
@@ -395,9 +393,22 @@ View.prototype.activePlayingDOM = function(videoId){
 	}
 }
 
-View.prototype.videoListEventSetUp = function(){
+View.prototype.videoListEventSetUp = function(chart = 0){
 	var self = this;
 
+	if (chart){
+		this.playListBodyDOM.sortable( "option", "disabled", true );		
+
+	}else{
+		this.playListBodyDOM.sortable( "option", "disabled", false );		
+		this.playListBodyDOM.sortable({
+			axis: "y"
+		});
+
+		this.playListBodyDOM.on( "sortupdate", function( event, ui ) {
+			self.currentPlayList.listIndexUpdate();
+		} );
+	}
 	$("#playlist-body li").click(function() {
 		self.videoPlayer.loadVideo($(this)[0].dataset);
 	});	
@@ -411,6 +422,14 @@ View.prototype.videoListEventSetUp = function(){
 		self.videoListContextMenuDOM.css("display", "inline");
         self.videoListContextMenuDOM.css("left", posx);
         self.videoListContextMenuDOM.css("top", posy);
+
+        if(chart){
+        	$('#videoListContextMenu .addVideo').css("display", "table-row");
+        	$('#videoListContextMenu .removeVideo').css("display", "none");
+        }else{
+        	$('#videoListContextMenu .addVideo').css("display", "none");
+        	$('#videoListContextMenu .removeVideo').css("display", "table-row");
+        }
 		evt.preventDefault();
 	});	
 }
@@ -451,16 +470,16 @@ View.prototype.contextEventSetUp = function(){
 
 	$('#videoListContextMenu .removeVideo').on('click', function(){
 		var dataset = self.selectedItem[0].dataset;
-		self.currentPlayList.removeVideo(dataset.id);
+		console.log(dataset);
+		self.currentPlayList.removeVideo(dataset.index);
 		self.videoListSetUp(self.currentPlayList.name);
 	});
-
 }
 
 View.prototype.getChartList = function(){
 	var self = this;
 	self.loadingDOM.removeClass("hidden");
-	$('#playlist-body')[0].innerHTML = "";
+	self.playListBodyDOM[0].innerHTML = "";
 	if(this.chartResetFlag){
 		self.melonListSetUp();		
 	}else{
@@ -499,7 +518,7 @@ View.prototype.melonListSetUp = function(){
     + '<div class="row-artist">{{artist}}</div>'
     + '</div></li>';
 
-    var playListBodyDOM = $('#playlist-body');
+    var playListBodyDOM = this.playListBodyDOM;
 	var chartList = this.melon.rtChart;
 	var bodyInnerHTML = "";
 	for (i=0;i<chartList.length;i++){
@@ -515,8 +534,9 @@ View.prototype.melonListSetUp = function(){
 
 	playListBodyDOM[0].innerHTML = bodyInnerHTML;
 
+	this.viewChart = true;
 	this.loadingDOM.addClass("hidden");
-	this.videoListEventSetUp();
+	this.videoListEventSetUp(1);
 }
 
 View.prototype.MelonVideoIDSetUp = function(){

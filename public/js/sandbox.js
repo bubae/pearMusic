@@ -66,7 +66,7 @@ var registerYouTubeEvents = function() {
     window.player = new YT.Player('player', {
       height: '200',
       width: '300',
-      videoId: 'c7rCyll5AeY',
+      // videoId: 'c7rCyll5AeY',
       events: {
         'onReady': onPlayerReady,
         'onStateChange': onPlayerStateChange,

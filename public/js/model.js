@@ -205,15 +205,15 @@ videoPlayer.prototype.setPlayList = function(playList){
 }
 
 videoPlayer.prototype.listCueSetUp = function(){
-	var keyList = Object.keys(this.currentPlayList.videoContainer).reverse();
+	var keyList = Object.keys(this.currentPlayList.videoContainer);
 	var tmpPlayCue = [];
 
-	this.playCue = [];
+	this.playCue = this.currentPlayList.videoContainer;
 	this.numList = keyList.length;
 
-	for(i=0;i<this.numList;i++){
-		this.playCue.push(this.currentPlayList.videoContainer[keyList[i]])
-	}
+	// for(i=0;i<this.numList;i++){
+	// 	this.playCue.push(this.currentPlayList.videoContainer[keyList[i]])
+	// }
 
 	this.RndPlayCue = shuffle(this.playCue);
 
@@ -246,13 +246,11 @@ videoPlayer.prototype.setWindowSize = function(width, height){
 
 videoPlayer.prototype.loadVideo = function(videoInfo){
 	this.currentVideo = videoInfo;
-	console.log(this.playMode);
 	if(this.playMode){
 		this.currentIndex = this.RndPlayCue.map(function(e){return e.id;}).indexOf(videoInfo.id);
 	}else{
 		this.currentIndex = this.playCue.map(function(e){return e.id;}).indexOf(videoInfo.id);
 	}
-	console.log(this.playMode, this.currentIndex, videoInfo);
 
 	// var video = this.currentPlayList.videoContainer[videoId];
 
@@ -368,15 +366,15 @@ listStorage.prototype.loadStorage = function(){
 listStorage.prototype.initStorage = function(playListID){
 	var self = this;
 
+	// console.log(playListID)
 	chrome.storage.sync.get(playListID, function(item){
+		console.log(item);
 		self.playlistContainer[playListID] = new videoStorage(playListID, item[playListID], self);
 		self.numLoaded = self.numLoaded + 1;
 		if( self.numLoaded >= self.playListIDSet.length){
 			self.view.playListSetUp();
 		}
 	});
-
-
 }
 
 listStorage.prototype.saveStorage = function(){
@@ -430,20 +428,53 @@ function videoStorage(name, videoContainer, listStorage) {
 	var self = this;
 	this.listStorage = listStorage;
 	this.name = (name) ? name : "MyList";
-	this.videoContainer = (videoContainer) ? videoContainer : {};
+	this.videoContainer = null;
+	if (videoContainer){
+		if(typeof videoContainer.concat == 'function'){
+			this.videoContainer = videoContainer;
+		}else{
+			this.videoContainer = $.map(videoContainer, function(value, index){
+				return [value];
+			});
+		}
+	}else{
+		this.videoContainer = [];
+	}
+	// this.videoContainer = (videoContainer) ? videoContainer : {};
 }
 
 videoStorage.prototype.changeName = function(newName){
 	this.name = newName;
 }
 
-videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
-	this.videoContainer[videoID] = {"id": videoID, "name": videoName, "artist": videoArtist};
+videoStorage.prototype.listIndexUpdate = function(){
+	var list = $(this.listStorage.view.playListBodyDOM).find('li');
+	var container = [];
+	for(i=0;i<list.length;i++){
+		// this.videoContainer[list[i].dataset.id].index = i;
+		$(list[i]).find('.row-index')[0].innerHTML = i+1;
+		obj = {};
+		obj.id = list[i].dataset.id;
+		obj.name = list[i].dataset.name;
+		obj.artist = list[i].dataset.artist;
+		obj.index = i;
+		container.push(obj);
+	}
+	this.videoContainer = container;
 	this.listStorage.saveStorage();
 }
 
-videoStorage.prototype.removeVideo = function(videoID) {
-	delete this.videoContainer[videoID];
+videoStorage.prototype.addVideo = function(videoID, videoName, videoArtist) {
+	this.videoContainer.unshift({"id": videoID, "name": videoName, "artist": videoArtist});
+	this.listStorage.saveStorage();
+}
+
+videoStorage.prototype.removeVideo = function(videoIndex) {
+	// delete this.videoContainer[videoID];
+	console.log(this.videoContainer, videoIndex);
+	this.videoContainer.splice(Number(videoIndex), 1);
+	console.log(this.videoContainer, videoIndex);
+	// this.listIndexUpdate();
 	this.listStorage.saveStorage();
 }
 

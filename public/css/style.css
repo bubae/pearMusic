@@ -349,7 +349,7 @@ input.volume-control-slider {
 }
 
 #video-wrapper {
-  z-index: 1070;  
+  z-index: 1030;  
   background-color: #252E45;
   color: #ffffff;
   float: right;
@@ -463,7 +463,7 @@ input.volume-control-slider {
   font-weight: bold;
 }
 
-/*#playlist-body li.playing,
+#playlist-body li.playing,
 #playlist-body li:hover{
   background-color: #4f5b69;
   -webkit-transition: all 0.5s ease;
@@ -471,7 +471,7 @@ input.volume-control-slider {
   -o-transition: all 0.5s ease;
   -ms-transition: all 0.5s ease;
   transition: all 0.5s ease;  
-}*/
+}
 
 
 #playlist-body .list-row div,
